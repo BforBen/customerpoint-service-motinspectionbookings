@@ -1,0 +1,286 @@
+﻿@model Dictionary<DateTime, List<TimeSpan>>
+@{
+    ViewBag.Title = "MoT and vehicle inspection bookings";
+    var ActiveMonth = (DateTime)ViewBag.ActiveMonth;
+}
+
+<style>
+    .BookingCalendar-legendBox {
+        height: 55px;
+        width: 55px;
+        border: 1px solid #dee0e2;
+    }
+    .BookingCalendar-legendBox--available {
+        background: #fff;
+    }
+    .BookingCalendar-legendBox--unavailable {
+        background: #f7f7f7 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAPklEQVQYV43M2QkAIAwEUVPcVr3FKREUj1zz/RhphUh2yZwiABLChXTmwhO58EUmtNAHPXTBCG2YoQkrSOEAyK0nO9YyUYwAAAAASUVORK5CYII=);
+    }
+    .BookingCalendar-header {
+        position: relative;
+        border: 1px solid #dee0e2;
+        background: white;
+    }
+
+    .BookingCalendar-currentMonth {
+        display: block;
+        font-size: 24px;
+        line-height: 1.25;
+        text-transform: none;
+        font-weight: 700;
+        margin: 0;
+        padding: 0.5em 0;
+        text-align: center;
+    }
+
+    button.BookingCalendar-nav--next,
+    button.BookingCalendar-nav--prev {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 0.632em;
+        line-height: 1.31579;
+        font-weight: bold;
+        text-transform: none;
+        color: #0b0c0c;
+        line-height: 30px;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    button.BookingCalendar-nav--prev {
+        margin-left: 10px;
+    }
+
+    button.BookingCalendar-nav--next {
+        left: auto;
+        right: 0;
+        margin-right: 10px;
+    }
+
+    .available {
+        background: #fff;
+    }
+
+    table.booking-calendar {
+        width: 100%;
+        border-width: 0 1px;
+        border-style: solid;
+        border-color: #dee0e2;
+        border-collapse: collapse;
+        background: #f7f7f7 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAPklEQVQYV43M2QkAIAwEUVPcVr3FKREUj1zz/RhphUh2yZwiABLChXTmwhO58EUmtNAHPXTBCG2YoQkrSOEAyK0nO9YyUYwAAAAASUVORK5CYII=);
+    }
+
+        table.booking-calendar thead th {
+            padding: 3px 0 0;
+            font-weight: bold;
+            line-height: normal;
+            text-align: center;
+            text-transform: uppercase;
+            background: #f8f8f8;
+            border-bottom: 2px solid #bfc1c3;
+        }
+
+        table.booking-calendar th, table.booking-calendar td {
+            width: 14.28571%;
+        }
+
+        table.booking-calendar tbody td {
+            padding: 0;
+            border-color: #dee0e2;
+            border-style: solid;
+            border-width: 0 0 1px 1px;
+        }
+
+    .BookingCalendar-content {
+        position: relative;
+        min-height: 55px;
+    }
+
+    a.BookingCalendar-dateLink, a.BookingCalendar-dateLink:visited {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        color: #0b0c0c;
+        text-decoration: none;
+    }
+
+        a.BookingCalendar-dateLink .BookingCalendar-day {
+            padding-left: 3px;
+        }
+
+        a.BookingCalendar-dateLink:hover {
+            color: #0b0c0c;
+            text-decoration: underline;
+            background: #d5e8f3;
+        }
+
+    .BookingCalendar-tag {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 0;
+        color: white;
+        line-height: normal;
+        text-align: center;
+        background: #6f777b;
+    }
+    .BookingCalendar-tag--today {
+    background: #2b8cc4;
+}
+    .BookingCalendar-date--bookable.is-active {
+    background: #96c6e2;
+}
+    .BookingCalendar-legend { margin-top: 1em; }
+    .BookingCalendar-legend > li { padding-right: 2em; }
+</style>
+@using (Html.BeginForm())
+{
+<p>Please choose a time:</p>
+
+<fieldset>
+    <div class="row">
+        <div class="col-md-5">
+            <div class="BookingCalendar hidden--mobile">
+                <div class="BookingCalendar-header">
+                    <button type="submit" class="BookingCalendar-nav BookingCalendar-nav--prev btn-link" name="availability" value="@ActiveMonth.AddMonths(-1).ToString("yyyy-M-d")"><span class="glyphicon glyphicon-menu-left"></span></button>
+                    <span class="BookingCalendar-currentMonth">@ActiveMonth.ToString("MMMM")</span>
+                    <button type="submit" class="BookingCalendar-nav BookingCalendar-nav--next btn-link" name="availability" value="@ActiveMonth.AddMonths(1).ToString("yyyy-M-d")"><span class="glyphicon glyphicon-menu-right"></span></button>
+                </div>
+
+                <table class="booking-calendar">
+                    <thead>
+                        <tr>
+                            <th>Mon</th>
+                            <th>Tue</th>
+                            <th>Wed</th>
+                            <th>Thu</th>
+                            <th>Fri</th>
+                            <th>Sat</th>
+                            <th>Sun</th>
+                        </tr>
+                    </thead>
+                </table>
+
+                <div class="BookingCalendar-mask">
+                    <table class="booking-calendar">
+                        <tbody class="BookingCalendar-datesBody">
+                            @{
+                                var StartDate = ViewBag.StartDate;
+                                var EndDate = ViewBag.EndDate;
+                                var i = 0;
+                                var CssClass = "";
+                            }
+
+                            <tr>
+                                @while (StartDate <= EndDate)
+                                {
+                                    {
+                                        i++;
+                                        List<TimeSpan> AvailabileTimes;
+                                        Model.TryGetValue(StartDate, out AvailabileTimes);
+                                        if (AvailabileTimes != null && AvailabileTimes.Count() > 0)
+                                        {
+                                            CssClass = "available";
+                                        }
+                                    }
+                                    <td title="@StartDate.ToString("dddd d MMMM")" class="@CssClass">
+                                        <div class="BookingCalendar-content">
+                                            <a class="BookingCalendar-dateLink" data-date="2016-05-31" href="#date-2016-05-31">
+                                                <span class="BookingCalendar-day">@StartDate.Day</span>
+                                                @if (StartDate == DateTime.Today)
+                                                {
+                                                    <span class="BookingCalendar-tag BookingCalendar-tag--today">Today</span>
+                                                }
+                                                @if (StartDate.Day == 1)
+                                                {
+                                                    <span class="BookingCalendar-tag" id="month-2016-07">@StartDate.ToString("MMM")</span>
+                                                }
+                                            </a>
+                                        </div>
+                                    </td>
+                                    if (i == 7)
+                                    {
+                                        @Html.Raw("</tr><tr>")
+                                        i = 0;
+                                    }
+                                    {
+                                        StartDate = StartDate.AddDays(1);
+                                        CssClass = "";
+                                    }
+                                }
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <ul class="BookingCalendar-legend list-inline">
+                <li>
+                    <div class="BookingCalendar-legendBox BookingCalendar-legendBox--available"></div>
+                    <p class="BookingCalendar-legendDesc">Availability</p>
+                </li>
+                <li>
+                    <div class="BookingCalendar-legendBox BookingCalendar-legendBox--unavailable"></div>
+                    <p class="BookingCalendar-legendDesc">No availability</p>
+                </li>
+            </ul>
+
+        </div>
+        <div class="col-md-4 col-md-offset-1">
+            <div class="SlotPicker-timeSlots">
+                <ul class="SlotPicker-days list-unstyled">
+                    @*<li class="SlotPicker-day SlotPicker-day--past">
+                <h2 class="SlotPicker-dayTitle">Wednesday 8 June</h2>
+                <p>It is not possible to book a visit in the past.</p>
+            </li>
+            <li class="SlotPicker-day SlotPicker-day--unavailable">
+                <h2 class="SlotPicker-dayTitle">Wednesday 8 June</h2>
+                <p>It is not possible to book a visit on this day.</p>
+            </li>
+            <li class="SlotPicker-day SlotPicker-day--beyond">
+                <h2 class="SlotPicker-dayTitle">Wednesday 8 June</h2>
+                <p>You can only book a visit in the next 14 days.</p>
+            </li>
+            <li class="SlotPicker-day SlotPicker-day--leadtime">
+                <h2 class="SlotPicker-dayTitle">Wednesday 8 June</h2>
+                <p>You can only book a visit 3 working days in advance.</p>
+            </li>*@
+
+                    @*<li class="SlotPicker-day" id="date-2016-06-07" tabindex="-1">
+                <h2 class="SlotPicker-dayTitle">Tuesday 7 June</h2>
+
+                <label class="SlotPicker-label" for="slot-2016-06-07T13:30/14:30">
+                    <input class="SlotPicker-slot" type="checkbox" value="2016-06-07T13:30/14:30" id="slot-2016-06-07T13:30/14:30">
+                    <strong class="SlotPicker-time">1:30pm</strong>
+                    <span class="SlotPicker-duration">1 hr</span>
+                </label>
+
+                <label class="SlotPicker-label" for="slot-2016-06-07T14:45/15:45">
+                    <input class="SlotPicker-slot" type="checkbox" value="2016-06-07T14:45/15:45" id="slot-2016-06-07T14:45/15:45">
+                    <strong class="SlotPicker-time">2:45pm</strong>
+                    <span class="SlotPicker-duration">1 hr</span>
+                </label>
+
+            </li>*@
+
+                    <li class="SlotPicker-day is-active" id="date-2016-06-08" tabindex="-1">
+                        <h2 class="SlotPicker-dayTitle">Wednesday 8 June</h2>
+
+                        <button class="SlotPicker-slot btn btn-default btn-lg btn-block" type="submit" name="slot" value="2016-06-08T13:30" id="slot-2016-06-08T13:30">
+                            1:30pm
+                        </button>
+
+                        <button class="SlotPicker-slot btn btn-default btn-lg btn-block" type="submit" name="slot" value="2016-06-08T14:30" id="slot-2016-06-08T14:30">
+                            2:30pm
+                        </button>
+
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</fieldset>
+}

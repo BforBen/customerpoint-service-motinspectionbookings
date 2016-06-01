@@ -1,0 +1,21 @@
+﻿@model IOrderedQueryable<IGrouping<CustomerPoint.Service.MotInspections.Models.Customer, CustomerPoint.Service.MotInspections.Models.ServiceCustomer>>
+@{
+    ViewBag.Title = "MoT and vehicle inspection bookings";
+}
+
+<p>Please pick which service you require:</p>
+
+@foreach (var customer in Model)
+{
+    <h2 id="@customer.Key.Slug">@Html.DisplayFor(s => customer.Key.Name)</h2>
+    if (!string.IsNullOrWhiteSpace(customer.Key.Description))
+    {
+        <p>@Html.DisplayFor(s => customer.Key.Description)</p>
+    }
+    <div class="list-group list-contents-bottom-divider">
+    @foreach(var service in customer)
+    {
+        <a href="@Url.Action("SelectTime", new { Service = service.Service.Slug, Customer = customer.Key.Slug })" class="list-group-item">@service.Service.Name</a>
+    }
+    </div>
+}

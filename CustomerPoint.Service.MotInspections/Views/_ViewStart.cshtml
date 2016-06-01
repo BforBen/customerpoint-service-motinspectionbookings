@@ -1,0 +1,26 @@
+﻿@{
+    if (Settings.Internal)
+    {
+        ViewContext.ViewData["ApplicationTitle"] = "CustomerPoint";
+        ViewContext.ViewData["NavBrandUrl"] = "/customerpoint";
+        ViewContext.ViewData["NavBrandTitle"] = "Go to the CustomerPoint homepage";
+    }
+    else
+    {
+        ViewContext.ViewData["ApplicationTitle"] = "Guildford Borough Council";
+        ViewContext.ViewData["NavBrandUrl"] = "http://www.guildford.gov.uk/";
+        ViewContext.ViewData["NavBrandTitle"] = "Go to the Guildford Borough Council homepage";
+
+        ViewContext.ViewData["ErrorHelpUrl"] = "http://www.guildford.gov.uk/contact";
+        ViewContext.ViewData["ErrorHelpName"] = "Customer Services";
+        ViewContext.ViewData["ErrorHelpTel"] = "01483 505050";
+    }
+    //ViewContext.ViewData["ApplicationVersion"] = "v" + GuildfordBoroughCouncil.Ict.Cmdb.About.Version + " (" + GuildfordBoroughCouncil.Ict.Cmdb.About.BuildDateAsString + ")";
+
+    ViewContext.ViewData["NgApp"] = "";
+    ViewContext.ViewData["HtmlClass"] = "";
+
+    ViewContext.ViewData["LegacyMode"] = !Settings.Internal;
+
+    Layout = "~/Views/Shared/_Layout.App.cshtml";
+}

@@ -1,0 +1,75 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    bool Legacy = (bool?)ViewContext.ViewData["LegacyMode"] ?? false;
+}
+@section HeadScripts
+{
+    @if (!Settings.Internal)
+    {
+        <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-12091009-1', 'auto');
+        @if (!String.IsNullOrWhiteSpace(ViewBag.AnalyticsPage))
+        {
+            <text>ga('set', 'page', '@ViewBag.AnalyticsPage');</text>
+        }
+        ga('send', 'pageview');
+        </script>
+    }@RenderSection("head", required: false)
+}
+@if (!Legacy)
+{
+    @section PrimaryNavigation
+    {
+        <li><a href="/customerpoint/service/admin/mot-inspections/">Admin</a></li>
+    }
+
+    @section ServiceStage
+    {
+        @if (IsSectionDefined("ServiceStage"))
+        {
+            @RenderSection("ServiceStage", required: false)
+        }
+    }
+}
+else
+{
+    @section PrimaryNavigation
+    {
+    }
+}
+@section FooterScripts
+{
+    <script>
+        jQuery.noConflict();
+        jQuery(function ($) {
+            $('[data-toggle="tooltip"]').tooltip();
+            $('[data-toggle="popover"]').popover();
+        });
+    </script>
+    @RenderSection("FooterScripts", required: false)
+}
+@section Footer
+{
+
+}
+@section Breadcrumb
+{
+    @if (Legacy)
+    {
+        <li><a href="http://www.guildford.gov.uk/home">Guildford Home Page</a></li>
+        @*<li><a href="http://www.guildford.gov.uk/recycling">Bins and Recycling</a></li>*@
+    }
+    else
+    {
+        <li><a href="/customerpoint">CustomerPoint</a></li>
+        @*<li><a href="/customerpoint/rubbish-and-recycling">Rubbish and recycling</a></li>*@
+        <li><a href="~/">MoT and vehicle inspections</a></li>
+    }
+    @RenderSection("breadcrumb", required: false)
+}
+@RenderBody()
