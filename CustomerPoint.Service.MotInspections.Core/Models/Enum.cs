@@ -16,7 +16,7 @@ namespace CustomerPoint.Service.MotInspections.Models
     public enum ReservationReason
     {
         [Display(Name = "Bay closed")]
-        Bay_Closed,
+        Bay_closed,
         [Display(Name = "Taxi or private hire only")]
         Taxi_or_PH_only,
         [Display(Name = "Guildford BC only")]
@@ -26,6 +26,8 @@ namespace CustomerPoint.Service.MotInspections.Models
         [Display(Name = "Woking BC only")]
         Woking_BC_only,
         [Display(Name = "Taxi test only")]
-        Taxi_Test_Only
+        Taxi_test_only,
+        [Display(Name = "Booking in progress")]
+        Booking_in_progress
     }
 }

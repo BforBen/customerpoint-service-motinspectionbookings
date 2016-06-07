@@ -1,0 +1,32 @@
+﻿.checkbox input[type=checkbox], .checkbox-inline input[type=checkbox], .radio input[type=radio], .radio-inline input[type=radio]
+{
+    margin: 8px 0 0;
+    margin-left: -18px;
+}
+
+.radio > label {
+    background: #efefef;
+    padding: 18px 36px;
+}
+
+.radio.checked > label {
+    border: 1px solid #212121;
+    padding: 17px 35px;
+    background: #fff;
+}
+
+.lead .checkbox input[type=checkbox], .lead .checkbox-inline input[type=checkbox], .lead .radio input[type=radio], .lead .radio-inline input[type=radio]
+{
+    margin-left: -21px;
+}
+
+.lead .radio > label {
+    padding: 21px 42px;
+}
+.lead .radio.checked > label {
+    padding: 20px 41px;
+}
+
+.vehicle-history-title { 
+    margin-top: 8em;
+}

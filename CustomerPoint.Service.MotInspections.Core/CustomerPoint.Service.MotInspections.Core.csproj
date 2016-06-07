@@ -112,6 +112,14 @@
     <Compile Include="Migrations\201606011454417_AddSlug.Designer.cs">
       <DependentUpon>201606011454417_AddSlug.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201606020936197_UpdateReservation.cs" />
+    <Compile Include="Migrations\201606020936197_UpdateReservation.Designer.cs">
+      <DependentUpon>201606020936197_UpdateReservation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201606020943045_UpdateSlot.cs" />
+    <Compile Include="Migrations\201606020943045_UpdateSlot.Designer.cs">
+      <DependentUpon>201606020943045_UpdateSlot.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Enum.cs" />
     <Compile Include="Models\MotData.cs" />
@@ -136,6 +144,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201606011454417_AddSlug.resx">
       <DependentUpon>201606011454417_AddSlug.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606020936197_UpdateReservation.resx">
+      <DependentUpon>201606020936197_UpdateReservation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606020943045_UpdateSlot.resx">
+      <DependentUpon>201606020943045_UpdateSlot.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

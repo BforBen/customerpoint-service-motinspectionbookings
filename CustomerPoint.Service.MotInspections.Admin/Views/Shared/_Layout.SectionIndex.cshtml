@@ -1,0 +1,32 @@
+﻿@{
+    if (!ViewContext.Controller.ControllerContext.IsChildAction)
+    {
+        Layout = "~/Views/Shared/_Layout.App.cshtml";
+    }
+}
+@if (IsSectionDefined("breadcrumb"))
+{
+    if (!ViewContext.Controller.ControllerContext.IsChildAction)
+    {
+        @section breadcrumb { @RenderSection("breadcrumb", required: false) }
+    }
+    else
+    {
+        WriteTo(TextWriter.Null, RenderSection("breadcrumb", required: false));
+    }
+}
+<section>
+    @if (ViewContext.Controller.ControllerContext.IsChildAction)
+    {
+        <h2 id="@(((string)ViewBag.Title).ToLower())">@ViewBag.Title</h2>
+    }
+    else
+    {
+        <div class="page-header">
+            <h1>@ViewBag.Title</h1>
+        </div>
+
+        @RenderSection("sectionHead", required: false)
+    }
+    @RenderBody()
+</section>

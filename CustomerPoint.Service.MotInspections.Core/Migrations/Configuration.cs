@@ -14,8 +14,12 @@ namespace CustomerPoint.Service.MotInspections.Migrations
 
         protected override void Seed(MotData context)
         {
+            context.Resources.AddOrUpdate(
+                r => r.Name,
+                new Resource { Name = "MoT bay" });
+
             context.Customers.AddOrUpdate(
-                c => new { c.Id, c.Name },
+                c => new { c.Name },
                     new Customer { Id = 1, Name = "Public", Hidden = false, LedgerCode = "V8598K4979" },
                     new Customer { Id = 2, Name = "Guildford BC", Hidden = false, LedgerCode = "V8598K8907" },
                     new Customer { Id = 3, Name = "Woking BC", Hidden = false, LedgerCode = "V8598K4908" },
@@ -28,7 +32,7 @@ namespace CustomerPoint.Service.MotInspections.Migrations
                 );
 
             context.Services.AddOrUpdate(
-                s => new { s.Id, s.Name },
+                s => new { s.Name },
                     new Models.Service { Id = 1, Name = "MOT" },
                     new Models.Service { Id = 2, Name = "MOT retest" },
                     new Models.Service { Id = 3, Name = "Private hire" },

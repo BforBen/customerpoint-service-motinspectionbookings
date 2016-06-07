@@ -49,6 +49,11 @@ else
         jQuery(function ($) {
             $('[data-toggle="tooltip"]').tooltip();
             $('[data-toggle="popover"]').popover();
+
+            $(document).on('change', 'input[type="radio"]', function () {
+                $('input[type="radio"]').parents('.radio').removeClass('checked');
+                $('input[type="radio"]:checked').parents('.radio').addClass('checked');
+            });
         });
     </script>
     @RenderSection("FooterScripts", required: false)

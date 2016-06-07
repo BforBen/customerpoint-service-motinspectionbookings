@@ -16,7 +16,8 @@ namespace CustomerPoint.Service.MotInspections.Controllers
         private MotData db = new MotData();
 
         [HttpGet]
-        [Route("~/{customer?}")]
+        [Route("~/")]
+        [Route("{customer}")]
         public ActionResult SelectService(string customer = null)
         {
             var Services = db.ServiceCustomers
@@ -28,7 +29,6 @@ namespace CustomerPoint.Service.MotInspections.Controllers
             return View(Services);
         }
 
-        //[HttpGet, HttpPost]
         [Route("{customer}/{service}")]
         public async Task<ActionResult> SelectTime(string service, string customer, DateTime? availability = null, DateTime? slot = null)
         {
@@ -39,6 +39,13 @@ namespace CustomerPoint.Service.MotInspections.Controllers
             if (Service == null)
             {
                 return HttpNotFound();
+            }
+
+            if (slot.HasValue)
+            {
+                TempData["Slot"] = slot;
+
+                return RedirectToAction("MakeBooking", new { service = service, customer = customer });
             }
 
             if (!availability.HasValue)
@@ -62,13 +69,14 @@ namespace CustomerPoint.Service.MotInspections.Controllers
 
 
             var Bookings = await db.Slots.OfType<Booking>().Where(b => DbFunctions.TruncateTime(b.Date) >= DbFunctions.TruncateTime(StartDate) && DbFunctions.TruncateTime(b.Date) <= DbFunctions.TruncateTime(EndDate) && !b.Cancelled.HasValue).ToListAsync();
+            var Reservations = await db.Slots.OfType<Reservation>().Where(b => DbFunctions.TruncateTime(b.Date) >= DbFunctions.TruncateTime(StartDate) && DbFunctions.TruncateTime(b.Date) <= DbFunctions.TruncateTime(EndDate)).ToListAsync();
 
             var AvailableSlots = new Dictionary<DateTime, List<TimeSpan>>();
             var TheDate = StartDate;
 
             var StartOfMorning = new TimeSpan(8, 00, 00);
             var Lunch = new TimeSpan(13, 00, 00);
-            var StartOfAfternoon = new TimeSpan(8, 00, 00);
+            var StartOfAfternoon = new TimeSpan(13, 30, 00);
             var EndOfDay = new TimeSpan(16, 30, 00);
 
             var ResourceCount = 2;
@@ -80,9 +88,12 @@ namespace CustomerPoint.Service.MotInspections.Controllers
                     var Times = new List<TimeSpan>();
                     var TheSlot = StartOfMorning;
 
+                    var DayBookings = Bookings.Where(b => b.Date.Date == TheDate.Date);
+                    var DayReservations = Reservations.Where(b => b.Date.Date == TheDate.Date);
+
                     do
                     {
-                        if (Bookings.Where(b => b.Date.TimeOfDay.Equals(TheSlot)).Count() < ResourceCount)
+                        if (DayBookings.Where(b => b.Date.TimeOfDay.Equals(TheSlot)).Count() < ResourceCount)
                         {
                             Times.Add(TheSlot);
                         }
@@ -96,7 +107,7 @@ namespace CustomerPoint.Service.MotInspections.Controllers
 
                         do
                         {
-                            if (Bookings.Where(b => b.Date.TimeOfDay.Equals(TheSlot)).Count() < ResourceCount)
+                            if (DayBookings.Where(b => b.Date.TimeOfDay.Equals(TheSlot)).Count() < ResourceCount)
                             {
                                 Times.Add(TheSlot);
                             }
@@ -113,7 +124,7 @@ namespace CustomerPoint.Service.MotInspections.Controllers
 
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
-
+            ViewBag.Service = Service.Service.Name;
             return View(AvailableSlots);
         }
 
@@ -121,8 +132,6 @@ namespace CustomerPoint.Service.MotInspections.Controllers
         [Route("{customer}/{service}/book")]
         public async Task<ActionResult> MakeBooking(string service, string customer)
         {
-            // Reserve slot against session ID for 10 minutes.
-
             var Service = await db.ServiceCustomers
                 .Where(s => s.Customer.Slug == customer && s.Service.Slug == service)
                 .SingleOrDefaultAsync();
@@ -132,7 +141,40 @@ namespace CustomerPoint.Service.MotInspections.Controllers
                 return HttpNotFound();
             }
 
-            return View();
+            var Slot = TempData["Slot"] as DateTime?;
+
+            if (!Slot.HasValue)
+                return RedirectToAction("SelectTime", new { service = service, customer = customer });
+
+            // Reserve slot against session ID for 15 minutes.
+            var Reservation = new Reservation
+            {
+                Date = Slot.Value,
+                Expires = DateTime.Now.AddMinutes(15),
+                SessionId = Session.SessionID,
+                Reason = ReservationReason.Booking_in_progress,
+                ResourceId = 1
+            };
+
+            db.Slots.Add(Reservation);
+            var x = await db.SaveChangesAsync();
+
+
+            var Booking = new BookingModel
+            {
+                ReservationId = Reservation.Id,
+                Customer = Service.Customer.Name,
+                CustomerId = Service.CustomerId,
+                Service = Service.Service.Name,
+                ServiceId = Service.ServiceId,
+                Slot = Slot.Value,
+                PriceToPay = Service.Price
+            };
+
+            ViewBag.ServiceSlug = service;
+            ViewBag.CustomerSlug = customer;
+
+            return View(Booking);
         }
 
         protected override void Dispose(bool disposing)

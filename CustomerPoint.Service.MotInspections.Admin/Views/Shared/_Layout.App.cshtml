@@ -1,0 +1,56 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string MainClass = "col-xs-12";
+
+    if (IsSectionDefined("secondary"))
+    {
+        MainClass = "col-md-8 col-lg-9";
+    }
+}
+@section PrimaryNavigation
+{
+    @RenderSection("PrimaryNavigation", false)
+}
+@section Footer
+{
+
+}
+@section Breadcrumb
+{
+    <li><a href="/customerpoint">CustomerPoint</a></li>
+    <li><a href="/customerpoint/service/mot-inspections/">MoT and vehicle inspections</a></li>
+    @if (IsSectionDefined("breadcrumb"))
+    {
+        <li><a href="@Url.Content("~/").ToLower()">Admin</a></li>
+        @RenderSection("breadcrumb", required: false)
+    }
+}
+<div class="row">
+    <div class="@MainClass">
+        <div class="article">
+            @RenderBody()
+        </div>
+    </div>
+    @if (IsSectionDefined("secondary"))
+    {
+        <div class="col-md-4 col-lg-3 secondary">
+            @RenderSection("secondary", required: false)
+        </div>
+    }
+</div>
+@section HeadScripts
+{
+    @RenderSection("HeadScripts", required: false)
+}
+@section FooterScripts
+{
+    <script>
+        jQuery.noConflict();
+        jQuery(function ($) {
+            $('[data-toggle="tooltip"]').tooltip();
+            $('[data-toggle="popover"]').popover();
+        });
+    </script>
+    @RenderSection("FooterScripts", required: false)
+}

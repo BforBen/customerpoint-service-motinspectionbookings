@@ -45,6 +45,7 @@ namespace CustomerPoint.Service.MotInspections.Models
 
         public byte DisplayOrder { get; set; }
 
+        [Display(Name = "Parent", Description = "")]
         public int? ParentId { get; set; }
 
         public string Slug { get; private set; }
@@ -131,19 +132,21 @@ namespace CustomerPoint.Service.MotInspections.Models
     {
         [Key]
         public int Id { get; set; }
-        public int BayId { get; set; }
+        public int ResourceId { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:ddd d MMM yyyy H:mm}")]
         [DataType(DataType.DateTime)]
         public DateTime Date { get; set; }
 
-        public Resource Bay { get; set; }
+        public Resource Resource { get; set; }
 
     }
 
     public class Reservation : Slot
     {
         public ReservationReason Reason { get; set; }
+        public DateTime? Expires { get; set; }
+        public string SessionId { get; set; }
     }
 
     public class Booking : Slot
@@ -333,15 +336,15 @@ namespace CustomerPoint.Service.MotInspections.Models
             {
                 var nb = entityEntry.Entity as Reservation;
 
-                if (Slots.OfType<Reservation>().Where(b => (b.Date == nb.Date) && (b.Bay == nb.Bay)).Count() > 0)
-                {
-                    result.ValidationErrors.Add(new DbValidationError("Date", "There is already a reservation for this bay and time."));
-                }
+                //if (Slots.OfType<Reservation>().Where(b => (b.Date == nb.Date) && (b.Bay == nb.Bay)).Count() > 0)
+                //{
+                //    result.ValidationErrors.Add(new DbValidationError("Date", "There is already a reservation for this bay and time."));
+                //}
 
-                if (Slots.OfType<Booking>().Where(b => (b.Date == nb.Date) && (b.Bay == nb.Bay) && !b.Cancelled.HasValue).Count() > 0)
-                {
-                    result.ValidationErrors.Add(new DbValidationError("Date", "There is already a booking for this bay and time."));
-                }
+                //if (Slots.OfType<Booking>().Where(b => (b.Date == nb.Date) && (b.Bay == nb.Bay) && !b.Cancelled.HasValue).Count() > 0)
+                //{
+                //    result.ValidationErrors.Add(new DbValidationError("Date", "There is already a booking for this bay and time."));
+                //}
 
                 if ((nb.Date.DayOfWeek == DayOfWeek.Saturday) || (nb.Date.DayOfWeek == DayOfWeek.Sunday))
                 {
@@ -364,19 +367,19 @@ namespace CustomerPoint.Service.MotInspections.Models
 
                     // Check for an existing booking, but exclude cancelled ones
 
-                    if (Slots.OfType<Booking>().Where(b => (b.Date == nb.Date) && (b.Bay == nb.Bay) && !b.Cancelled.HasValue).Count() > 0)
-                    {
-                        result.ValidationErrors.Add(new DbValidationError("Date", "There is already a booking for this bay and time."));
-                    }
+                    //if (Slots.OfType<Booking>().Where(b => (b.Date == nb.Date) && (b.Bay == nb.Bay) && !b.Cancelled.HasValue).Count() > 0)
+                    //{
+                    //    result.ValidationErrors.Add(new DbValidationError("Date", "There is already a booking for this bay and time."));
+                    //}
 
                     // Check for a reservation.
-                    if (!nb.IgnoreReservation)
-                    {
-                        if (Slots.OfType<Reservation>().Where(b => (b.Date == nb.Date) && (b.Bay == nb.Bay)).Count() > 0)
-                        {
-                            result.ValidationErrors.Add(new DbValidationError("Date", "There is already a booking for this bay and time."));
-                        }
-                    }
+                    //if (!nb.IgnoreReservation)
+                    //{
+                    //    if (Slots.OfType<Reservation>().Where(b => (b.Date == nb.Date) && (b.Bay == nb.Bay)).Count() > 0)
+                    //    {
+                    //        result.ValidationErrors.Add(new DbValidationError("Date", "There is already a booking for this bay and time."));
+                    //    }
+                    //}
                 }
             }
 

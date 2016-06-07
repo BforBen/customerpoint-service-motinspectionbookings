@@ -1,0 +1,15 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.App.cshtml";
+}
+@section breadcrumb
+{
+    <li><a href="@Url.Action("Index", "Settings")">Settings</a></li>
+    @if (ViewContext.Controller.ValueProvider.GetValue("Action").RawValue.ToString() != "Index")
+    { 
+    <li><a href="@Url.Action("Index")">Services</a></li>
+    }
+}
+@section secondary {
+    @RenderSection("secondary", required: false)
+}
+@RenderBody()

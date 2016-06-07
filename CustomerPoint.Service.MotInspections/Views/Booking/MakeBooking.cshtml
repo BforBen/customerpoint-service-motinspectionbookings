@@ -1,0 +1,166 @@
+﻿@model CustomerPoint.Service.MotInspections.Models.BookingModel
+@{
+    ViewBag.Title = "Booking details";
+}
+
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.CustomerId)
+    @Html.HiddenFor(m => m.ServiceId)
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <p class="lead">
+        This is a booking for a <strong>@Html.DisplayFor(model => model.Service)</strong> (@Html.DisplayFor(model => model.Customer))
+        on <strong>@Html.DisplayFor(model => model.Slot)</strong>.
+    </p>
+
+    <div class="row">
+        <div class="col-sm-6 text-center">
+            <p class="lrg-number">@Html.DisplayFor(model => model.Service)</p>
+        </div>
+        <div class="col-sm-6 text-center">
+            <p class="lead">@Html.DisplayFor(model => model.Slot)</p>
+            <p class="lrg-number">@Html.DisplayFor(model => model.Slot)</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Your details</h2>
+
+            <div class="form-group @(Html.ValidationErrorFor(model => model.Name, "has-error"))">
+                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                @Html.DescriptionFor(model => model.Name)
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "help-block" })
+                @Html.EditorFor(model => model.Name, string.Empty, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+
+            <div class="form-group @(Html.ValidationErrorFor(model => model.Telephone, "has-error"))">
+                @Html.LabelFor(model => model.Telephone)
+                @Html.DescriptionFor(model => model.Telephone)
+                @Html.ValidationMessageFor(model => model.Telephone, "", new { @class = "help-block" })
+                @Html.EditorFor(model => model.Telephone, string.Empty, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Vehicle details</h2>
+
+            <div class="form-group vehicle-lookup @(Html.ValidationErrorFor(model => model.VehicleReg, "has-error"))">
+                @Html.LabelFor(model => model.VehicleReg)
+                @Html.DescriptionFor(model => model.VehicleReg)
+                @Html.ValidationMessageFor(model => model.VehicleReg, "", new { @class = "help-block" })
+                <div class="input-group">
+                    @Html.EditorFor(model => model.VehicleReg, string.Empty, new { htmlAttributes = new { @class = "form-control", maxlength = "8", placeholder = "e.g. AB12 3CD" } })
+                    <span class="input-group-btn">
+                        <button class="btn btn-default btn-vehicle-lookup" type="button">Lookup vehicle details</button>
+                    </span>
+                </div>                
+            </div>
+
+            <div class="form-group hide @(Html.ValidationErrorFor(model => model.VehicleMake, "has-error"))">
+                @Html.LabelFor(model => model.VehicleMake, htmlAttributes: new { @class = "control-label" })
+                @Html.DescriptionFor(model => model.VehicleMake)
+                @Html.ValidationMessageFor(model => model.VehicleMake, "", new { @class = "help-block" })
+                @Html.HiddenFor(model => model.VehicleMake)
+                <p class="form-control-static"></p>
+            </div>
+
+            <div class="form-group hide @(Html.ValidationErrorFor(model => model.VehicleModel, "has-error"))">
+                @Html.LabelFor(model => model.VehicleModel, htmlAttributes: new { @class = "control-label" })
+                @Html.DescriptionFor(model => model.VehicleModel)
+                @Html.ValidationMessageFor(model => model.VehicleModel, "", new { @class = "help-block" })
+                @Html.HiddenFor(model => model.VehicleModel)
+                <p class="form-control-static"></p>
+            </div>
+
+            @if (Model.Customer != "Public")
+            {
+            <div class="form-group @(Html.ValidationErrorFor(model => model.VehiclePlate, "has-error"))">
+                @Html.LabelFor(model => model.VehiclePlate, htmlAttributes: new { @class = "control-label" })
+                @Html.DescriptionFor(model => model.VehiclePlate)
+                @Html.ValidationMessageFor(model => model.VehiclePlate, "", new { @class = "help-block" })
+                @Html.EditorFor(model => model.VehiclePlate, string.Empty, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+            }
+        </div>
+        <div class="col-md-6 col-md-offset-2 hide">
+            <h3 class="vehicle-history-title">Vehicle history</h3>
+            <div id="vehicle-history" data-src="@Url.Action("Vehicle", "History")" class="spinner"></div>
+        </div>
+    </div>
+
+    if (Model.PriceToPay > 0)
+    {
+    <h2>Payment</h2>
+
+    <p>The total to pay is <strong>@Html.DisplayFor(model => model.PriceToPay)</strong>. Please choose when you would like to pay.</p>
+
+    <div class="form-group @(Html.ValidationErrorFor(model => model.PriceToPay, "has-error"))">
+        <div class="radio">
+            <label>
+                <input type="radio" name="PriceToPay" value="@Model.PriceToPay">
+                @Html.DisplayNameFor(model => model.PriceToPay)
+            </label>
+        </div>
+
+        <p class="form-control-static">or</p>
+
+        <div class="radio">
+            <label>
+                <input type="radio" name="PriceToPay" value="0">
+                @Html.DisplayNameFor(model => model.PayLater)
+            </label>
+        </div>
+    </div>
+    }
+    else
+    {
+        <input type="hidden" name="PriceToPay" value="-1">
+    }
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-lg btn-primary">
+            Make booking
+        </button>
+    </div>
+}
+
+<p>@Html.ActionLink("Back", "SelectTime", new { service = ViewBag.ServiceSlug, customer = ViewBag.CustomerSlug }, new { @class = "btn btn-lg btn-link text-left" })</p>
+
+@section FooterScripts
+{
+    <script>
+        jQuery(function ($) {
+            $(document).on('click', '.btn-vehicle-lookup', function () {
+                var vrm = $(this).parent().siblings('input').val() || '';
+
+                if (vrm == '')
+                    return;
+
+                $('[name="VehicleMake"], [name="VehicleModel"]').parents('.form-group').removeClass('hide');
+
+                var vh = $('#vehicle-history');
+                vh.parent().removeClass('hide');
+                $.get(vh.data('src') + '?vrm=' + vrm, function (view) {
+                    vh.removeClass('spinner').html(view);
+                });
+            });
+
+            $(document).on('keypress', '.vehicle-lookup input[type="text"]', function (event) {
+                if (event.keyCode === 10 || event.keyCode === 13)
+                    event.preventDefault();
+
+            });
+        });
+    </script>
+}
