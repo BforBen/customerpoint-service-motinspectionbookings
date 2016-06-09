@@ -21,12 +21,15 @@
     </p>
 
     <div class="row">
-        <div class="col-sm-6 text-center">
+        <div class="col-sm-5 text-center">
             <p class="lrg-number">@Html.DisplayFor(model => model.Service)</p>
+        </div>
+        <div class="col-sm-1 text-center">
+            <p class="lead text-muted">on</p>
         </div>
         <div class="col-sm-6 text-center">
             <p class="lead">@Html.DisplayFor(model => model.Slot)</p>
-            <p class="lrg-number">@Html.DisplayFor(model => model.Slot)</p>
+            <p class="lrg-number">@Html.DisplayFor(model => model.Slot).ToString().ToLower()</p>
         </div>
     </div>
 
@@ -36,7 +39,7 @@
             <h2>Your details</h2>
 
             <div class="form-group @(Html.ValidationErrorFor(model => model.Name, "has-error"))">
-                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                @Html.LabelFor(model => model.Name)
                 @Html.DescriptionFor(model => model.Name)
                 @Html.ValidationMessageFor(model => model.Name, "", new { @class = "help-block" })
                 @Html.EditorFor(model => model.Name, string.Empty, new { htmlAttributes = new { @class = "form-control" } })
@@ -48,11 +51,7 @@
                 @Html.ValidationMessageFor(model => model.Telephone, "", new { @class = "help-block" })
                 @Html.EditorFor(model => model.Telephone, string.Empty, new { htmlAttributes = new { @class = "form-control" } })
             </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-4">
             <h2>Vehicle details</h2>
 
             <div class="form-group vehicle-lookup @(Html.ValidationErrorFor(model => model.VehicleReg, "has-error"))">
@@ -60,44 +59,27 @@
                 @Html.DescriptionFor(model => model.VehicleReg)
                 @Html.ValidationMessageFor(model => model.VehicleReg, "", new { @class = "help-block" })
                 <div class="input-group">
-                    @Html.EditorFor(model => model.VehicleReg, string.Empty, new { htmlAttributes = new { @class = "form-control", maxlength = "8", placeholder = "e.g. AB12 3CD" } })
+                    @Html.EditorFor(model => model.VehicleReg, string.Empty, new { htmlAttributes = new { @class = "form-control text-upper", maxlength = "8", placeholder = "e.g. AB12 3CD" } })
                     <span class="input-group-btn">
                         <button class="btn btn-default btn-vehicle-lookup" type="button">Lookup vehicle details</button>
                     </span>
-                </div>                
+                </div>
             </div>
 
-            <div class="form-group hide @(Html.ValidationErrorFor(model => model.VehicleMake, "has-error"))">
-                @Html.LabelFor(model => model.VehicleMake, htmlAttributes: new { @class = "control-label" })
-                @Html.DescriptionFor(model => model.VehicleMake)
-                @Html.ValidationMessageFor(model => model.VehicleMake, "", new { @class = "help-block" })
-                @Html.HiddenFor(model => model.VehicleMake)
-                <p class="form-control-static"></p>
-            </div>
-
-            <div class="form-group hide @(Html.ValidationErrorFor(model => model.VehicleModel, "has-error"))">
-                @Html.LabelFor(model => model.VehicleModel, htmlAttributes: new { @class = "control-label" })
-                @Html.DescriptionFor(model => model.VehicleModel)
-                @Html.ValidationMessageFor(model => model.VehicleModel, "", new { @class = "help-block" })
-                @Html.HiddenFor(model => model.VehicleModel)
-                <p class="form-control-static"></p>
-            </div>
-
-            @if (Model.Customer != "Public")
-            {
-            <div class="form-group @(Html.ValidationErrorFor(model => model.VehiclePlate, "has-error"))">
-                @Html.LabelFor(model => model.VehiclePlate, htmlAttributes: new { @class = "control-label" })
-                @Html.DescriptionFor(model => model.VehiclePlate)
-                @Html.ValidationMessageFor(model => model.VehiclePlate, "", new { @class = "help-block" })
-                @Html.EditorFor(model => model.VehiclePlate, string.Empty, new { htmlAttributes = new { @class = "form-control" } })
-            </div>
-            }
-        </div>
-        <div class="col-md-6 col-md-offset-2 hide">
-            <h3 class="vehicle-history-title">Vehicle history</h3>
-            <div id="vehicle-history" data-src="@Url.Action("Vehicle", "History")" class="spinner"></div>
         </div>
     </div>
+
+    <div class="row hide spinner" id="vehicle-details" data-src="@Url.Action("Vehicle", "History")"></div>
+
+    if (Model.Customer != "Public")
+    {
+        <div class="form-group @(Html.ValidationErrorFor(model => model.VehiclePlate, "has-error"))">
+            @Html.LabelFor(model => model.VehiclePlate)
+            @Html.DescriptionFor(model => model.VehiclePlate)
+            @Html.ValidationMessageFor(model => model.VehiclePlate, "", new { @class = "help-block" })
+            @Html.EditorFor(model => model.VehiclePlate, string.Empty, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    }
 
     if (Model.PriceToPay > 0)
     {
@@ -142,24 +124,27 @@
     <script>
         jQuery(function ($) {
             $(document).on('click', '.btn-vehicle-lookup', function () {
-                var vrm = $(this).parent().siblings('input').val() || '';
+                var vrmi = $(this).parent().siblings('input'),
+                    vrm = vrmi.val() || '';
 
                 if (vrm == '')
                     return;
 
-                $('[name="VehicleMake"], [name="VehicleModel"]').parents('.form-group').removeClass('hide');
+                vrm = vrm.toUpperCase();
 
-                var vh = $('#vehicle-history');
-                vh.parent().removeClass('hide');
+                var vh = $('#vehicle-details');
+                vh.removeClass('hide');
                 $.get(vh.data('src') + '?vrm=' + vrm, function (view) {
                     vh.removeClass('spinner').html(view);
                 });
             });
 
             $(document).on('keypress', '.vehicle-lookup input[type="text"]', function (event) {
-                if (event.keyCode === 10 || event.keyCode === 13)
+                if (event.keyCode === 10 || event.keyCode === 13) {
                     event.preventDefault();
-
+                    $('.btn-vehicle-lookup').click();
+                    vrmi.val('');
+                }
             });
         });
     </script>

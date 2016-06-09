@@ -1,0 +1,7 @@
+﻿.table .checkbox input[type=checkbox], 
+.table .checkbox-inline input[type=checkbox], 
+.table .radio input[type=radio], 
+.table .radio-inline input[type=radio]
+{
+    margin-left: 8px;
+}

@@ -1,0 +1,41 @@
+﻿@model List<IGrouping<string, CustomerPoint.Service.MotInspections.Models.ServiceCustomer>>
+@{
+    ViewBag.Title = "Price list";
+}
+
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Service</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td rowspan="@item.Count()">@Html.DisplayFor(modelItem => item.Key)</td>
+                @{
+                    int i = 0;
+                }
+                @foreach (var Service in item)
+                {
+                    if (i > 0)
+                    {
+                        <text>
+                        <tr>
+                        </text>
+                    }
+                    <td title="@Service.ServiceId">@Html.DisplayFor(modelItem => Service.Service.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => Service.Price)</td>
+                    i++;
+                }
+            </tr>
+        }
+    </tbody>
+</table>

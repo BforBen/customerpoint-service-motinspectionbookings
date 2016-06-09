@@ -1,0 +1,42 @@
+﻿@model CustomerPoint.Service.MotInspections.Admin.Models.ReportModel
+@{
+    Layout = "~/Views/Shared/_Layout.SectionIndex.cshtml";
+    ViewBag.Title = "Reports";
+
+    var Today = DateTime.Today;
+}
+@section breadcrumb { }
+@if (!ViewContext.Controller.ControllerContext.IsChildAction)
+{
+    @section sectionHead {
+        <p>Listed below are the reports available</p>
+    }
+}
+
+@using (Html.BeginForm("Index", "Report", FormMethod.Post))
+{
+    <div class="form-group">
+        @Html.LabelFor(model => model.From)
+        @Html.TextBoxFor(model => model.From, new { @class = "form-control", type = "date" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.To)
+        @Html.TextBoxFor(model => model.To, new { @class = "form-control", type = "date" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Customer)
+        @Html.DropDownListFor(model => model.Customer, null, string.Empty, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Status)
+        @Html.EnumDropDownListFor(model => model.Status, string.Empty, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <button type="submit" name="action" value="SalesJournal" class="btn btn-lg btn-default">Sales journal</button>
+        <button type="submit" name="action" value="JobDetails" class="btn btn-lg btn-default">Job details</button>
+    </div>
+}

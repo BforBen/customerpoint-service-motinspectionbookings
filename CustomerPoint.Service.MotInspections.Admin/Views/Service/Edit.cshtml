@@ -12,42 +12,47 @@
 {
     @Html.AntiForgeryToken()
 
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.Id)
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.Id)
 
-        <div class="form-group @(Html.ValidationErrorFor(model => model.ParentId, "has-error"))">
-            @Html.LabelFor(model => model.ParentId)
-            @Html.EditorFor(model => model.ParentId, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.ParentId, "", new { @class = "text-danger" })
-        </div>
+    <div class="form-group @(Html.ValidationErrorFor(model => model.ParentId, "has-error"))">
+        @Html.LabelFor(model => model.ParentId)
+        @Html.DescriptionFor(model => model.ParentId)
+        @Html.ValidationMessageFor(model => model.ParentId, "", new { @class = "help-block" })
+        @Html.DropDownListFor(model => model.ParentId, null, string.Empty, new { @class = "form-control" })
+    </div>
 
-        <div class="form-group @(Html.ValidationErrorFor(model => model.Name, "has-error"))">
-            @Html.LabelFor(model => model.Name)
-            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-        </div>
+    <div class="form-group @(Html.ValidationErrorFor(model => model.Name, "has-error"))">
+        @Html.LabelFor(model => model.Name)
+        @Html.DescriptionFor(model => model.Name)
+        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "help-block" })
+        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+    </div>
 
-        <div class="form-group @(Html.ValidationErrorFor(model => model.Description, "has-error"))">
-            @Html.LabelFor(model => model.Description)
-            @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-        </div>
+    <div class="form-group @(Html.ValidationErrorFor(model => model.Description, "has-error"))">
+        @Html.LabelFor(model => model.Description)
+        @Html.DescriptionFor(model => model.Description)
+        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "help-block" })
+        @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+    </div>
 
-        <div class="form-group @(Html.ValidationErrorFor(model => model.Charge, "has-error"))">
-            @Html.LabelFor(model => model.Charge)
-            @Html.EditorFor(model => model.Charge, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.Charge, "", new { @class = "text-danger" })
-        </div>
+    <div class="form-group @(Html.ValidationErrorFor(model => model.Charge, "has-error"))">
+        @Html.LabelFor(model => model.Charge)
+        @Html.DescriptionFor(model => model.Charge)
+        @Html.ValidationMessageFor(model => model.Charge, "", new { @class = "help-block" })
+        @Html.EditorFor(model => model.Charge, new { htmlAttributes = new { @class = "form-control" } })
+    </div>
 
-        <div class="form-group @(Html.ValidationErrorFor(model => model.DisplayOrder, "has-error"))">
-            @Html.LabelFor(model => model.DisplayOrder)
-            @Html.EditorFor(model => model.DisplayOrder, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.DisplayOrder, "", new { @class = "text-danger" })
-        </div>
+    <div class="form-group @(Html.ValidationErrorFor(model => model.DisplayOrder, "has-error"))">
+        @Html.LabelFor(model => model.DisplayOrder)
+        @Html.DescriptionFor(model => model.DisplayOrder)
+        @Html.ValidationMessageFor(model => model.DisplayOrder, "", new { @class = "help-block" })
+        @Html.EditorFor(model => model.DisplayOrder, new { htmlAttributes = new { @class = "form-control" } })
+    </div>
 
-        <div class="form-group">
-            <button type="submit" class="btn btn-lg btn-primary">Save</button>
-        </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-lg btn-primary">Save</button>
+    </div>
 }
 
 <p>@Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-link" })</p>

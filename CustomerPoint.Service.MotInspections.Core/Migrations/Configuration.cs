@@ -34,9 +34,27 @@ namespace CustomerPoint.Service.MotInspections.Migrations
             context.Services.AddOrUpdate(
                 s => new { s.Name },
                     new Models.Service { Id = 1, Name = "MOT" },
-                    new Models.Service { Id = 2, Name = "MOT retest" },
-                    new Models.Service { Id = 3, Name = "Private hire" },
-                    new Models.Service { Id = 4, Name = "Taxi" }
+                    new Models.Service { Id = 2, Name = "Private hire" },
+                    new Models.Service { Id = 3, Name = "Taxi" },
+
+                    new Models.Service { Name = "MOT", ParentId = 1, Charge = 54.8m },
+                    new Models.Service { Name = "MOT retest", ParentId = 1, Charge = 54.8m },
+
+                    new Models.Service { Name = "Inspection", ParentId = 2, Charge = 57 },
+                    new Models.Service { Name = "Inspection retest", ParentId = 2, Charge = 57 },
+                    new Models.Service { Name = "Inspection & MOT", ParentId = 2, Charge = 57 },
+                    new Models.Service { Name = "Inspection retest & MOT", ParentId = 2, Charge = 84.4m },
+                    new Models.Service { Name = "Compliance inspection", ParentId = 2, Charge = 57 },
+
+                    new Models.Service { Name = "Inspection", ParentId = 3, Charge = 57 },
+                    new Models.Service { Name = "Inspection retest", ParentId = 3, Charge = 57 },
+                    new Models.Service { Name = "Inspection & MOT", ParentId = 3, Charge = 57 },
+                    new Models.Service { Name = "Inspection retest & MOT", ParentId = 3, Charge = 84.4m },
+                    new Models.Service { Name = "Compliance inspection", ParentId = 3, Charge = 57 },
+
+                    new Models.Service { Name = "Engineers report", Charge = 57 },
+                    new Models.Service { Name = "Administration", Charge = 0 },
+                    new Models.Service { Name = "Legacy", Charge = 0 }
                 );
 
             context.ServiceCustomers.AddOrUpdate(

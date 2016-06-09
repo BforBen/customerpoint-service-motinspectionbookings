@@ -12,25 +12,40 @@ namespace CustomerPoint.Service.MotInspections.Admin.Controllers
     {
         private MotData db = new MotData();
 
-        [Route]
+        [Route("{service?}")]
         [HttpGet]
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(string service = null)
         {
-            var services = db.Services.Where(s => !s.ParentId.HasValue);
-            return View(await services.OrderBy(s => s.Name).ToListAsync());
+            ViewBag.Parent = true;
+            var services = await db.Services.Where(s => !s.ParentId.HasValue).ToListAsync();
+
+            if (!string.IsNullOrWhiteSpace(service))
+            {
+                var srv = services.Where(s => s.Slug == service).SingleOrDefault();
+
+                if (srv != null)
+                {
+                    services = await db.Services.Where(s => s.ParentId == srv.Id).ToListAsync();
+                    ViewBag.Parent = false;
+                }
+            }
+
+            return View(services.OrderBy(s => s.Name));
         }
 
         [Route("add")]
         [HttpGet]
         public ActionResult Create()
         {
+            ViewBag.ParentId = new SelectList(db.Services.Where(s => !s.ParentId.HasValue), "Id", "Name");
+
             return View();
         }
 
         [HttpPost]
         [Route("add")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Name,Description,Hidden,LedgerCode")] Models.Service service)
+        public async Task<ActionResult> Create([Bind(Include = "ParentId,Name,Description,Charge,DisplayOrder")] MotInspections.Models.Service service)
         {
             if (ModelState.IsValid)
             {
@@ -38,6 +53,8 @@ namespace CustomerPoint.Service.MotInspections.Admin.Controllers
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
+
+            ViewBag.ParentId = new SelectList(db.Services.Where(s => !s.ParentId.HasValue), "Id", "Name", service.ParentId);
 
             return View(service);
         }
@@ -50,18 +67,23 @@ namespace CustomerPoint.Service.MotInspections.Admin.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             var service = await db.Services.FindAsync(id);
+
             if (service == null)
             {
                 return HttpNotFound();
             }
+
+            ViewBag.ParentId = new SelectList(db.Services.Where(s => !s.ParentId.HasValue), "Id", "Name", service.ParentId);
+
             return View(service);
         }
 
         [HttpPost]
         [Route("{id:int}/edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Name,Description,Hidden,LedgerCode")] Models.Service service)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,ParentId,Name,Description,Charge,DisplayOrder")] MotInspections.Models.Service service)
         {
             if (ModelState.IsValid)
             {
@@ -69,33 +91,10 @@ namespace CustomerPoint.Service.MotInspections.Admin.Controllers
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            return View(service);
-        }
 
-        [Route("{id:int}/delete")]
-        public async Task<ActionResult> Delete(int id = 0)
-        {
-            if (id == 0)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            var service = await db.Services.FindAsync(id);
-            if (service == null)
-            {
-                return HttpNotFound();
-            }
-            return View(service);
-        }
+            ViewBag.ParentId = new SelectList(db.Services.Where(s => !s.ParentId.HasValue), "Id", "Name", (service != null ? service.ParentId : null));
 
-        [HttpPost]
-        [Route("{id:int}/delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmed(int id)
-        {
-            var service = await db.Services.FindAsync(id);
-            db.Services.Remove(service);
-            await db.SaveChangesAsync();
-            return RedirectToAction("Index");
+            return View(service);
         }
 
         protected override void Dispose(bool disposing)

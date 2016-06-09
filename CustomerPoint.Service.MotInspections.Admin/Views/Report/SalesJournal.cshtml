@@ -1,0 +1,59 @@
+﻿@model IEnumerable<CustomerPoint.Service.MotInspections.Models.Booking>
+
+@{
+    ViewBag.Title = "Sales journal";
+}
+
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+
+<p><strong>Period:</strong> @(((DateTime)ViewBag.From).ToString("d MMMM yyyy")) to @(((DateTime)ViewBag.to).ToString("d MMMM yyyy")).</p>
+
+@if (Model.Count() == 0)
+{
+    <p class="lead text-info">No sales found.</p>
+}
+
+@foreach (var Group in Model.GroupBy(b => b.Customer).OrderBy(b => b.Key.Name))
+{
+    <h2>@Group.Key.Name</h2>
+    
+    
+    <table class="table table-striped">
+	<thead>
+    <tr>
+        <th>@Html.DisplayNameFor(model => model.Service)</th>
+        <th>@Html.DisplayNameFor(model => model.Status)</th>
+        <th>Count</th>
+        <th>Cost</th>
+    </tr>
+	</thead>
+	<tbody>
+    @{
+        int Total = 0;
+        decimal Sum = 0;
+    }
+@foreach (var item in Group.GroupBy(g => new { g.Service.Name, g.Status, g.Service.Charge }).OrderBy(g => g.Key.Name).ThenBy(g => g.Key.Status))
+{
+    {
+        Total += item.Count();
+        Sum += item.Sum(t => t.Cost.Value);
+    }
+    <tr>
+        <td>@Html.DisplayFor(modelItem => item.Key.Name)</td>
+        <td>@Html.DisplayFor(modelItem => item.Key.Status)</td>
+        <td>@item.Count()</td>
+        <td>@(item.Sum(t => t.Cost.Value).ToString("C"))</td>
+    </tr>
+}
+	</tbody>
+    <tfoot>
+    <tr>
+        <td colspan="2">Total</td>
+        <td>@Total</td>
+        <td>@Sum.ToString("C")</td>
+    </tr>
+    </tfoot>
+</table>
+}

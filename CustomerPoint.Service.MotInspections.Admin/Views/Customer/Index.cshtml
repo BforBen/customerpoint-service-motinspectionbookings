@@ -25,7 +25,10 @@
                 <td>@Html.DisplayFor(modelItem => item.Name)</td>
                 <td>@Html.DisplayFor(modelItem => item.Description)</td>
                 <td>@Html.DisplayFor(modelItem => item.Hidden)</td>
-                <td>@Html.ActionLink("Edit", "Edit", new { id = item.Id })</td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class ="btn btn-link" })
+                    @Html.ActionLink("Services", "Services", new { id = item.Id }, new { @class = "btn btn-link" })
+                </td>
             </tr>
         }
     </tbody>

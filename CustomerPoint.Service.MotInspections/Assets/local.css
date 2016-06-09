@@ -28,5 +28,8 @@
 }
 
 .vehicle-history-title { 
-    margin-top: 8em;
+    margin-top: 0;
+}
+.text-upper {
+    text-transform: uppercase;
 }

@@ -9,7 +9,8 @@ namespace CustomerPoint.Service.MotInspections.Admin
         public static void RegisterBundles(BundleCollection bundles)
         {
             bundles.Add(new StyleBundle("~/assets/css").Include(
-                      "~/assets/main.css"));
+                      "~/assets/main.css",
+                      "~/assets/local.css"));
         }
     }
 }

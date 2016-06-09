@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Web.Mvc;
 using CustomerPoint.Service.MotInspections.Models;
+using CustomerPoint.Service.MotInspections.Admin.Models;
 
 namespace CustomerPoint.Service.MotInspections.Admin.Controllers
 {
@@ -72,30 +73,28 @@ namespace CustomerPoint.Service.MotInspections.Admin.Controllers
             return View(customer);
         }
 
-        [Route("{id:int}/delete")]
-        public async Task<ActionResult> Delete(int id = 0)
+        [Route("{id:int}/services")]
+        [HttpGet]
+        public async Task<ActionResult> Services(int id = 0)
         {
             if (id == 0)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             var customer = await db.Customers.FindAsync(id);
+            
             if (customer == null)
             {
                 return HttpNotFound();
             }
-            return View(customer);
-        }
 
-        [HttpPost]
-        [Route("{id:int}/delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmed(int id)
-        {
-            var customer = await db.Customers.FindAsync(id);
-            db.Customers.Remove(customer);
-            await db.SaveChangesAsync();
-            return RedirectToAction("Index");
+            var model = new UpdateCustomerServices();
+
+            model.Customer = customer;
+            model.Services = await db.Services.Where(s => s.Services.Count() > 0).ToListAsync();
+            model.CustomerServices = customer.Services.ToList();
+
+            return View(model);
         }
 
         protected override void Dispose(bool disposing)

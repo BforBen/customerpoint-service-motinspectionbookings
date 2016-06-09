@@ -20,6 +20,7 @@ namespace CustomerPoint.Service.MotInspections.Models
         public Service()
         {
             Charge = 0;
+            DisplayOrder = 0;
         }
 
         [Key]
@@ -41,11 +42,13 @@ namespace CustomerPoint.Service.MotInspections.Models
         public string Description { get; set; }
 
         [DataType(DataType.Currency)]
+        [Display(Description = "This value can be overridden on a per customer basis.")]
         public decimal Charge { get; set; }
 
+        [Display(Name = "Display order", Description = "Use this to override the alphabetical listing of services.")]
         public byte DisplayOrder { get; set; }
 
-        [Display(Name = "Parent", Description = "")]
+        [Display(Name = "Parent", Description = "This allows services to be grouped. Choosing a parent is optional.")]
         public int? ParentId { get; set; }
 
         public string Slug { get; private set; }
@@ -78,6 +81,7 @@ namespace CustomerPoint.Service.MotInspections.Models
         }
         public string Description { get; set; }
         [MaxLength(10)]
+        [Display(Name = "Ledger code", Description = "This is the ledger code payments will be recorded against")]
         public string LedgerCode { get; set; }
         public bool Hidden { get; set; }
 
