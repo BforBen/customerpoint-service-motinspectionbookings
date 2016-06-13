@@ -33,3 +33,7 @@
 .text-upper {
     text-transform: uppercase;
 }
+.vertical-align-middle {
+    padding-top: 0.7em;
+    font-size: larger;
+}

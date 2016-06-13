@@ -15,24 +15,21 @@
 
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-    <p class="lead">
-        This is a booking for a <strong>@Html.DisplayFor(model => model.Service)</strong> (@Html.DisplayFor(model => model.Customer))
-        on <strong>@Html.DisplayFor(model => model.Slot)</strong>.
-    </p>
+    <p class="h3">This is a booking for a:</p>
 
-    <div class="row">
+    <div class="row h1">
         <div class="col-sm-5 text-center">
-            <p class="lrg-number">@Html.DisplayFor(model => model.Service)</p>
+            <h2><small>@Html.DisplayFor(model => model.Customer)</small> @Html.DisplayFor(model => model.Service)</h2>
         </div>
-        <div class="col-sm-1 text-center">
-            <p class="lead text-muted">on</p>
+        <div class="col-sm-1 text-center h1 small vertical-align-middle">
+            on
         </div>
-        <div class="col-sm-6 text-center">
-            <p class="lead">@Html.DisplayFor(model => model.Slot)</p>
-            <p class="lrg-number">@Html.DisplayFor(model => model.Slot).ToString().ToLower()</p>
+        <div class="col-sm-5 text-center">
+            <h2>@Model.Slot.ToString("dddd d MMMM yyyy")</h2>
+            <p class="small">at</p>
+            <p>@Model.Slot.ToString("H:mmtt").ToLower()</p>
         </div>
     </div>
-
 
     <div class="row">
         <div class="col-md-6">
@@ -71,39 +68,43 @@
 
     <div class="row hide spinner" id="vehicle-details" data-src="@Url.Action("Vehicle", "History")"></div>
 
-    if (Model.Customer != "Public")
-    {
-        <div class="form-group @(Html.ValidationErrorFor(model => model.VehiclePlate, "has-error"))">
-            @Html.LabelFor(model => model.VehiclePlate)
-            @Html.DescriptionFor(model => model.VehiclePlate)
-            @Html.ValidationMessageFor(model => model.VehiclePlate, "", new { @class = "help-block" })
-            @Html.EditorFor(model => model.VehiclePlate, string.Empty, new { htmlAttributes = new { @class = "form-control" } })
+    <div class="row">
+        <div class="col-md-6">
+            @if (Model.Customer != "Public")
+            {
+                <div class="form-group @(Html.ValidationErrorFor(model => model.VehiclePlate, "has-error"))">
+                    @Html.LabelFor(model => model.VehiclePlate)
+                    @Html.DescriptionFor(model => model.VehiclePlate)
+                    @Html.ValidationMessageFor(model => model.VehiclePlate, "", new { @class = "help-block" })
+                    @Html.EditorFor(model => model.VehiclePlate, string.Empty, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            }
         </div>
-    }
+    </div>
 
     if (Model.PriceToPay > 0)
     {
-    <h2>Payment</h2>
+        <h2>Payment</h2>
 
-    <p>The total to pay is <strong>@Html.DisplayFor(model => model.PriceToPay)</strong>. Please choose when you would like to pay.</p>
+        <p>The total to pay is <strong>@Html.DisplayFor(model => model.PriceToPay)</strong>. Please choose when you would like to pay.</p>
 
-    <div class="form-group @(Html.ValidationErrorFor(model => model.PriceToPay, "has-error"))">
-        <div class="radio">
-            <label>
-                <input type="radio" name="PriceToPay" value="@Model.PriceToPay">
-                @Html.DisplayNameFor(model => model.PriceToPay)
-            </label>
+        <div class="form-group @(Html.ValidationErrorFor(model => model.PriceToPay, "has-error"))">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="PriceToPay" value="@Model.PriceToPay">
+                    @Html.DisplayNameFor(model => model.PriceToPay)
+                </label>
+            </div>
+
+            <p class="form-control-static">or</p>
+
+            <div class="radio">
+                <label>
+                    <input type="radio" name="PriceToPay" value="0">
+                    @Html.DisplayNameFor(model => model.PayLater)
+                </label>
+            </div>
         </div>
-
-        <p class="form-control-static">or</p>
-
-        <div class="radio">
-            <label>
-                <input type="radio" name="PriceToPay" value="0">
-                @Html.DisplayNameFor(model => model.PayLater)
-            </label>
-        </div>
-    </div>
     }
     else
     {
