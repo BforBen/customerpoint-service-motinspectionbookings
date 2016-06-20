@@ -1,0 +1,37 @@
+﻿@model Nullable<Int32>
+@{
+    ViewBag.Title = "MoT and vehicle inspection";
+}
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(ViewBag.Message))
+{
+    <div class="callout callout-@ViewBag.AlertType">
+        <h4>@ViewBag.Heading</h4>
+        <p>@ViewBag.Message</p>
+        @if ((bool)ViewBag.TryAgain && Model.HasValue)
+        {
+            using (Html.BeginForm("Finish", "Booking", null, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@(Model.Value)">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-lg btn-primary">Try payment again</button>
+                </div>
+            }
+        }
+    </div>
+}
+<p class="finish">
+    @if (Settings.Internal)
+    {
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Finished</a>
+    }
+    else
+    {
+        <a href="http://www.guildford.gov.uk/mot" class="btn btn-primary">Finished</a>
+    }
+</p>
+@*<p>@Html.ActionLink("Back", "PickQuantity", new { Uprn = ViewBag.Uprn }, new { @class = "btn btn-link" })</p>*@

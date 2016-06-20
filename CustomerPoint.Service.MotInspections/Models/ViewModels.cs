@@ -19,13 +19,16 @@ namespace CustomerPoint.Service.MotInspections.Models
         public string Customer { get; set; }
         public string Service { get; set; }
 
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter your name")]
         public string Name { get; set; }
         [DataType(DataType.PhoneNumber)]
         [Display(Name = "Telephone", Description = "We'll use this number to contact you about your booking")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter your telephone number so we can contact you about your booking")]
         public string Telephone { get; set; }
 
         [MaxLength(8)]
         [Display(Name = "Please enter the vehicle registration")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter your vehicle registration")]
         public string VehicleReg { get; set; }
         [Display(Name = "Vehicle make")]
         public string VehicleMake { get; set; }

@@ -69,7 +69,8 @@ namespace CustomerPoint.Service.MotInspections.Controllers
 
 
             var Bookings = await db.Slots.OfType<Booking>().Where(b => DbFunctions.TruncateTime(b.Date) >= DbFunctions.TruncateTime(StartDate) && DbFunctions.TruncateTime(b.Date) <= DbFunctions.TruncateTime(EndDate) && !b.Cancelled.HasValue).ToListAsync();
-            var Reservations = await db.Slots.OfType<Reservation>().Where(b => DbFunctions.TruncateTime(b.Date) >= DbFunctions.TruncateTime(StartDate) && DbFunctions.TruncateTime(b.Date) <= DbFunctions.TruncateTime(EndDate)).ToListAsync();
+            var Reservations = await db.Slots.OfType<Reservation>().Where(b => DbFunctions.TruncateTime(b.Date) >= DbFunctions.TruncateTime(StartDate) && DbFunctions.TruncateTime(b.Date) <= DbFunctions.TruncateTime(EndDate) && (!b.Expires.HasValue || b.Expires > DateTime.Now)).ToListAsync();
+//TODO filter reservations to type of booking?
 
             var AvailableSlots = new Dictionary<DateTime, List<TimeSpan>>();
             var TheDate = StartDate;
@@ -93,7 +94,9 @@ namespace CustomerPoint.Service.MotInspections.Controllers
 
                     do
                     {
-                        if (DayBookings.Where(b => b.Date.TimeOfDay.Equals(TheSlot)).Count() < ResourceCount)
+                        var TotalSlots = DayBookings.Where(b => b.Date.TimeOfDay.Equals(TheSlot)).Count() +
+                            DayReservations.Where(b => b.Date.TimeOfDay.Equals(TheSlot)).Count();
+                        if (TotalSlots < ResourceCount)
                         {
                             Times.Add(TheSlot);
                         }
@@ -159,7 +162,6 @@ namespace CustomerPoint.Service.MotInspections.Controllers
             db.Slots.Add(Reservation);
             var x = await db.SaveChangesAsync();
 
-
             var Booking = new BookingModel
             {
                 ReservationId = Reservation.Id,
@@ -175,6 +177,162 @@ namespace CustomerPoint.Service.MotInspections.Controllers
             ViewBag.CustomerSlug = customer;
 
             return View(Booking);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("{customer}/{service}/book")]
+        public async Task<ActionResult> MakeBooking(string service, string customer, BookingModel booking)
+        {
+            var Service = await db.ServiceCustomers
+                .Where(s => s.Customer.Slug == customer && s.Service.Slug == service)
+                .SingleOrDefaultAsync();
+
+            if (Service == null)
+            {
+                return HttpNotFound();
+            }
+
+            var Reservation = await db.Slots.OfType<Reservation>().Where(r => r.Id == booking.ReservationId).SingleOrDefaultAsync();
+
+            if (Reservation == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (Reservation.Expires < DateTime.Now)
+            {
+                // Reservation has expired
+                ModelState.AddModelError("", "Your reservation has expired");
+            }
+
+            if (Service.Customer.Name != "Public" && string.IsNullOrWhiteSpace(booking.VehiclePlate))
+            {
+                ModelState.AddModelError("VehiclePlate", "Private hire and taxi vehicles must enter their plate number");
+            }
+
+            // Extend reservation to another 10 minutes
+            Reservation.Expires = DateTime.Now.AddMinutes(10);
+            var x = await db.SaveChangesAsync();
+
+            if (ModelState.IsValid)
+            {
+                var b = new Booking();
+
+                b.BookedBy = (Settings.Internal ? User.Identity.GetUser() : new GuildfordBoroughCouncil.Data.Models.User("customerpoint"));
+                b.CustomerId = Service.CustomerId;
+                b.Date = Reservation.Date;
+                b.IgnoreReservation = true;
+                b.Name = booking.Name;
+                b.PriceToPay = Service.Price;
+                b.ResourceId = 1;
+                b.ServiceId = Service.ServiceId;
+                b.Status = Status.Outstanding;
+                b.Telephone = booking.Telephone;
+                b.VehicleMake = booking.VehicleMake;
+                b.VehicleModel = booking.VehicleModel;
+                b.VehiclePlate = booking.VehiclePlate;
+                b.VehicleRegistration = booking.VehicleReg;
+
+                db.Slots.Add(b);
+
+                x = await db.SaveChangesAsync();
+
+                var RedirectUrl = Url.Action("Finish", new { service = service, customer = customer, id = b.Id });
+
+                if (booking.PriceToPay > 0)
+                {
+                    //always take the amount to pay from the DB
+                    b.CollectPaymentAtEvent = false;
+
+                    RedirectUrl = b.GetPaymentsUrl(User.Identity.Name, Url.Action("Finish", "Booking", new { service = service, customer = customer, id = b.Id }, "http"), false, Settings.Internal, Service.Customer.LedgerCode);
+
+                    x = await db.SaveChangesAsync();
+                }                
+
+                return Redirect(RedirectUrl);
+            }
+
+            ViewBag.ServiceSlug = service;
+            ViewBag.CustomerSlug = customer;
+
+            booking.Slot = Reservation.Date;
+            booking.Customer = Service.Customer.Name;
+            booking.CustomerId = Service.CustomerId;
+            booking.Service = Service.Service.Name;
+            booking.ServiceId = Service.ServiceId;
+            booking.PriceToPay = Service.Price;
+
+            return View(booking);
+        }
+
+        [Route("{customer}/{service}/book/{id:int}")]
+        public ActionResult Finish(string customer, string service, int id, CustomerPoint.Models.AdelanteResponse PaymentStatus)
+        {
+            //ViewBag.AnalyticsPage = Url.Action("PaymentStatus", new { Uprn = Uprn }).Replace(Uprn.ToString() + "/", "");
+
+            string Message = "";
+            string AlertType = "";
+            string Heading = "";
+            bool TryAgain = true;
+
+            #region Adelante
+            if (PaymentStatus.ErrorStatus.HasValue)
+            {
+                // Completed
+                if (PaymentStatus.ErrorStatus.Value == 1)
+                {
+                    if (PaymentStatus.AuthStatus.HasValue && PaymentStatus.AuthStatus.Value == 1)
+                    {
+                        AlertType = "success";
+                        Heading = "Payment successful";
+                        Message = "Thank you, your payment has been successful. The receipt number is " + PaymentStatus.IasOrderNo + ". Please allow 24 hours for changes to your subscription to appear on this website. New or additional bins will be delivered in four to six weeks.";
+                        TryAgain = false;
+                    }
+                    else
+                    {
+                        AlertType = "danger";
+                        Heading = "Payment declined";
+                        Message = "Sorry, this payment has been declined. Please use a different credit or debit card and try again.";
+                    }
+                }
+                else
+                {
+                    if (PaymentStatus.ErrorCode.HasValue && PaymentStatus.ErrorCode.Value == 51)
+                    {
+                        AlertType = "danger";
+                        Heading = "Payment problem";
+                        Message = @"Sorry, something has gone wrong and the payments system has been unable to verify if the payment was successful. Please contact Customer Services on 01483 444499.";
+                        TryAgain = false;
+                    }
+                    else
+                    {
+                        AlertType = "danger";
+                        Heading = "Payment not successful";
+                        Message = @"Sorry, something has gone wrong and this payment has been unsuccessful. Please try again. If this problem continues please try a different credit or debit card or contact Customer Services on 01483 444499.";
+                    }
+                }
+
+                if (PaymentStatus.ErrorStatus.Value == 0 || (PaymentStatus.ErrorStatus.Value == 1 && PaymentStatus.AuthStatus.HasValue && PaymentStatus.AuthStatus.Value == 0))
+                {
+                    try
+                    {
+                        throw new Exception(String.IsNullOrWhiteSpace(PaymentStatus.ErrorDescription) ? "Adelante response code: " + PaymentStatus.ErrorCode : "Adelante response: " + PaymentStatus.ErrorDescription + (PaymentStatus.ErrorCode.HasValue ? " [" + PaymentStatus.ErrorCode + "]" : ""));
+                    }
+                    catch (Exception ex)
+                    {
+                        Serilog.Log.Error(ex, "Payment failed");
+                    }
+                }
+            }
+            #endregion
+
+            ViewBag.Message = Message;
+            ViewBag.Heading = Heading;
+            ViewBag.AlertType = AlertType;
+            ViewBag.TryAgain = TryAgain;
+
+            return View(id);
         }
 
         protected override void Dispose(bool disposing)

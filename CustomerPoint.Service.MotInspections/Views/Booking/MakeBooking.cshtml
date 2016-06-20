@@ -12,6 +12,7 @@
     @Html.AntiForgeryToken()
     @Html.HiddenFor(m => m.CustomerId)
     @Html.HiddenFor(m => m.ServiceId)
+    @Html.HiddenFor(m => m.ReservationId)
 
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
@@ -66,7 +67,16 @@
         </div>
     </div>
 
-    <div class="row hide spinner" id="vehicle-details" data-src="@Url.Action("Vehicle", "History")"></div>
+    if (!string.IsNullOrWhiteSpace(Model.VehicleReg))
+    {
+        <div class="row" id="vehicle-details" data-src="@Url.Action("Vehicle", "History")">
+            @Html.Action("Vehicle", "History", new { vrm = Model.VehicleReg })
+        </div>
+    }
+    else
+    {
+        <div class="row hide spinner" id="vehicle-details" data-src="@Url.Action("Vehicle", "History")"></div>
+    }
 
     <div class="row">
         <div class="col-md-6">

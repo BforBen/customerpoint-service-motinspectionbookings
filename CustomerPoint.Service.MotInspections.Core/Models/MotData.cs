@@ -155,6 +155,11 @@ namespace CustomerPoint.Service.MotInspections.Models
 
     public class Booking : Slot
     {
+        public Booking()
+        {
+            CollectPaymentAtEvent = true;
+        }
+
         public Status Status { get; set; }
         [Display(Name = "Service")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "You must select a service.")]
@@ -221,14 +226,14 @@ namespace CustomerPoint.Service.MotInspections.Models
             {
                 try
                 {
-                    if (Customer.Name == "Public" && Status == Models.Status.Failed_to_Attend)
+                    if (Customer.Name == "Public" && Status == Status.Failed_to_Attend)
                     {
                         return 0;
                     }
 
                     var Cost = Service.Charge;
 
-                    if (Status == Models.Status.Failed_to_Attend && Cost > 0)
+                    if (Status == Status.Failed_to_Attend && Cost > 0)
                     {
                         return 57;
                     }
@@ -259,9 +264,23 @@ namespace CustomerPoint.Service.MotInspections.Models
 
         public bool CollectPaymentAtEvent { get; set; }
 
-        public virtual string GetPaymentsUrl(string User, string ReturnUrl, bool RegeneratePayRef = false, bool Internal = false)
+        /// <summary>
+        /// Make sure you call save after this so persist the new payment reference.
+        /// </summary>
+        /// <param name="User"></param>
+        /// <param name="ReturnUrl"></param>
+        /// <param name="RegeneratePayRef">If you are retrying a payment, set to true to create a new payment reference. Remember to call save after to persist.</param>
+        /// <param name="Internal"></param>
+        /// <param name="LedgerCode">Specify the ledger code - especially if a new booking as Customer.LedgerCode will be null</param>
+        /// <returns>A URL to redirect the user to so they can make a payment</returns>
+        public virtual string GetPaymentsUrl(string User, string ReturnUrl, bool RegeneratePayRef = false, bool Internal = false, string LedgerCode = null)
         {
-            if (String.IsNullOrWhiteSpace(PaymentRef) || RegeneratePayRef)
+            if (string.IsNullOrWhiteSpace(LedgerCode) && Customer == null)
+            {
+                throw new ArgumentNullException("LedgerCode", "You must specify the ledger code");
+            }
+
+            if (string.IsNullOrWhiteSpace(PaymentRef) || RegeneratePayRef)
             {
                 var payRef = "MotInspM" + Id.ToString();
 

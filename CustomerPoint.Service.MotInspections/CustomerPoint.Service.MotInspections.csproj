@@ -48,12 +48,24 @@
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="CustomerPoint.Core, Version=2.0.2.33460, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CustomerPoint.Core.2.0.2\lib\net46\CustomerPoint.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GuildfordBoroughCouncil.ActiveDirectory, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GuildfordBoroughCouncil.ActiveDirectory.1.1.0\lib\net45\GuildfordBoroughCouncil.ActiveDirectory.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GuildfordBoroughCouncil.ActiveDirectory.Lookup, Version=1.3.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GuildfordBoroughCouncil.ActiveDirectory.Lookup.1.3.7\lib\net45\GuildfordBoroughCouncil.ActiveDirectory.Lookup.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="GuildfordBoroughCouncil.Linq, Version=1.2.6.0, Culture=neutral, processorArchitecture=MSIL">
@@ -94,6 +106,10 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Net.Http.Primitives, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -197,6 +213,7 @@
     <Content Include="Views\Booking\SelectTime.cshtml" />
     <Content Include="Views\Booking\MakeBooking.cshtml" />
     <Content Include="Views\History\Vehicle.cshtml" />
+    <Content Include="Views\Booking\Finish.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
