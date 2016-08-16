@@ -75,7 +75,7 @@ namespace CustomerPoint.Service.MotInspections.Admin.Controllers
                 return HttpNotFound();
             }
 
-            ViewBag.ParentId = new SelectList(db.Services.Where(s => !s.ParentId.HasValue), "Id", "Name", service.ParentId);
+            ViewBag.ParentId = new SelectList(db.Services.Where(s => !s.ParentId.HasValue && s.Id != id), "Id", "Name", service.ParentId);
 
             return View(service);
         }
@@ -92,7 +92,7 @@ namespace CustomerPoint.Service.MotInspections.Admin.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.ParentId = new SelectList(db.Services.Where(s => !s.ParentId.HasValue), "Id", "Name", (service != null ? service.ParentId : null));
+            ViewBag.ParentId = new SelectList(db.Services.Where(s => !s.ParentId.HasValue && s.Id != service.Id), "Id", "Name", (service != null ? service.ParentId : null));
 
             return View(service);
         }

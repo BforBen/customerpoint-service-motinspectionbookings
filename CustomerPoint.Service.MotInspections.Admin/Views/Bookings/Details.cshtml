@@ -1,0 +1,344 @@
+﻿@using CustomerPoint.Service.MotInspections.Models
+@model Booking
+
+@{
+    ViewBag.Title = "Booking details";
+}
+
+<p class="h3">This is a booking for a:</p>
+
+<div class="row h1">
+    <div class="col-sm-5 text-center">
+        <h2><small>@Html.DisplayFor(model => model.Customer.Name)</small> @Html.DisplayFor(model => model.Service.Name)</h2>
+    </div>
+    <div class="col-sm-1 text-center h1 small vertical-align-middle">
+        on
+    </div>
+    <div class="col-sm-5 text-center">
+        <h2>@Model.Date.ToString("dddd d MMMM yyyy")</h2>
+        <p class="small">at</p>
+        <p>@Model.Date.ToString("H:mmtt").ToLower()</p>
+    </div>
+</div>
+
+
+<div class="row text-center">
+    <div class="col-sm-6">
+        @if (Model.OverridePayment)
+        {
+            <div class="lead alert alert-success">
+                <h2><span class="glyphicon glyphicon-ok"></span> Paid</h2>
+                <p class="small">Manually marked as paid</p>
+                <p>&nbsp;</p>
+            </div>
+        }
+        else if (Model.PriceToPay > 0)
+        {
+            if (Model.PaymentSuccessful)
+            {
+                var divCss = "warning";
+                var spanCss = "warning-sign";
+                if (Model.Payment.Sum(p => p.Amount) == Model.PriceToPay)
+                {
+                    divCss = "success";
+                    spanCss = "ok";
+                }
+                <div class="lead alert alert-@divCss">
+                    <h2><span class="glyphicon glyphicon-@spanCss"></span> Paid</h2>
+                    @foreach (var payment in Model.Payment)
+                    {
+                        <p class="small">@payment.Method - @payment.Id</p>
+                        <p>@Html.DisplayFor(model => payment.Amount) on @Html.DisplayFor(model => payment.Date)</p>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="lead alert alert-danger">
+                    <h2><span class="glyphicon glyphicon-remove"></span> Not paid</h2>
+                    <p class="small">Payment of @Html.DisplayFor(model => model.PriceToPay) required</p>
+                    <p>
+                        @using (Html.BeginForm("BookingPostPayment", "Booking", new { id = Model.Id }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("id", Model.Id)
+                        <button type="submit" name="retry" value="true" class="btn btn-default">Take payment</button>
+                    }
+                </p>
+            </div>
+            }
+        }
+        else if (Model.PriceToPay == 0 || !Model.PriceToPay.HasValue)
+        {
+            <div class="lead alert alert-success">
+                <h2><span class="glyphicon glyphicon-ok"></span></h2>
+                <p>No payment required</p>
+                <p class="small">&nbsp;</p>
+            </div>
+        }
+        else
+        {
+            <div class="lead alert alert-warning">
+                <h2><span class="glyphicon glyphicon-warning-sign"></span> Not paid?</h2>
+                <p class="small">No payment details found</p>
+                <p>&nbsp;</p>
+            </div>
+        }
+    </div>
+    <div class="col-sm-6">
+        @{
+            string IconClass = "";
+            string AlertClass = "";
+            switch (Model.Status)
+            {
+                case Status.Failed:
+                    IconClass = "glyphicon-remove";
+                    AlertClass = "alert-danger";
+                    break;
+                case Status.Passed:
+                    IconClass = "glyphicon-ok";
+                    AlertClass = "alert-success";
+                    break;
+                case Status.Failed_to_Attend:
+                    IconClass = "glyphicon-remove";
+                    AlertClass = "alert-warning";
+                    break;
+                case Status.Cancelled:
+                    IconClass = "glyphicon-remove";
+                    AlertClass = "alert-warning";
+                    break;
+                case Status.Outstanding:
+                    IconClass = "glyphicon-info-sign";
+                    AlertClass = "alert-info";
+                    break;
+                case Status.Completed:
+                    IconClass = "glyphicon-info-sign";
+                    AlertClass = "alert-info";
+                    break;
+            }
+        }
+
+        <div class="lead alert @AlertClass">
+            <h2><span class="glyphicon @IconClass"></span> @Html.DisplayFor(model => model.Status)</h2>
+            <p class="small">@Html.DisplayFor(model => model.Customer.Name) @Html.DisplayFor(model => model.Service.Name)</p>
+            <p>@Html.DisplayFor(model => model.Date) in @Html.DisplayFor(model => model.Resource.Name)</p>
+        </div>
+    </div>
+
+</div>
+
+@if (Model.Status != Status.Cancelled && Model.Status != Status.Outstanding)
+{
+    <h2>Test result</h2>
+
+            <table class="table">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.TestSerialNumber)</th>
+                    <td>@Html.DisplayFor(model => model.TestSerialNumber)</td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Inspector)</th>
+                    <td>@Html.DisplayFor(model => model.Inspector)</td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.InspectorNotes)</th>
+                    <td>@Html.DisplayFor(model => model.InspectorNotes)</td>
+                </tr>
+            </table>
+}
+
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Your details</h2>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name)
+            @Html.DisplayFor(model => model.Name)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Telephone)
+            @Html.DisplayFor(model => model.Telephone)
+        </div>
+
+        <h2>Vehicle details</h2>
+
+        
+
+    </div>
+</div>
+
+
+<h2>Details</h2>
+
+<div>
+    <h4>Booking</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Resource.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Resource.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Date)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.VehicleMake)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.VehicleMake)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.VehicleModel)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.VehicleModel)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.VehicleRegistration)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.VehicleRegistration)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.VehiclePlate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.VehiclePlate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Telephone)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Telephone)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Inspector)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Inspector)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TestSerialNumber)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TestSerialNumber)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.InspectorNotes)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.InspectorNotes)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BookedBy)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BookedBy)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Cancelled)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Cancelled)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PriceToPay)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PriceToPay)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PaymentRef)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PaymentRef)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.OverridePayment)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OverridePayment)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CollectPaymentAtEvent)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CollectPaymentAtEvent)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Customer.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Customer.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Service.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Service.Name)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

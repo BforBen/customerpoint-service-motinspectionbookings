@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = "At which time?";
     var ActiveMonth = (DateTime)ViewBag.ActiveMonth;
+    var BankHolidays = (List<DateTime>)ViewBag.BankHolidays;
 }
 
 <div class="page-header">
@@ -10,149 +11,16 @@
 
 <p class="lead">Use the calendar below to pick a time for your <strong>@ViewBag.Service</strong>.</p>
 
-<style>
-        .BookingCalendar-legendBox {
-            height: 55px;
-            width: 55px;
-            border: 1px solid #dee0e2;
-        }
-        .BookingCalendar-legendBox--available {
-            background: #fff;
-        }
-        .BookingCalendar-legendBox--unavailable {
-            background: #f7f7f7 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAPklEQVQYV43M2QkAIAwEUVPcVr3FKREUj1zz/RhphUh2yZwiABLChXTmwhO58EUmtNAHPXTBCG2YoQkrSOEAyK0nO9YyUYwAAAAASUVORK5CYII=);
-        }
-        .BookingCalendar-header {
-            position: relative;
-            border: 1px solid #dee0e2;
-            background: white;
-        }
-
-        .BookingCalendar-currentMonth {
-            display: block;
-            font-size: 24px;
-            line-height: 1.25;
-            text-transform: none;
-            font-weight: 700;
-            margin: 0;
-            padding: 0.5em 0;
-            text-align: center;
-        }
-
-        button.BookingCalendar-nav--next,
-        button.BookingCalendar-nav--prev {
-            position: absolute;
-            top: 0;
-            left: 0;
-            padding: 0.632em;
-            line-height: 1.31579;
-            font-weight: bold;
-            text-transform: none;
-            color: #0b0c0c;
-            line-height: 30px;
-            text-decoration: none;
-            text-align: center;
-        }
-
-        button.BookingCalendar-nav--prev {
-            margin-left: 10px;
-        }
-
-        button.BookingCalendar-nav--next {
-            left: auto;
-            right: 0;
-            margin-right: 10px;
-        }
-
-        .BookingCalendar-date--bookable {
-            background: #fff;
-        }
-
-        table.booking-calendar {
-            width: 100%;
-            border-width: 0 1px;
-            border-style: solid;
-            border-color: #dee0e2;
-            border-collapse: collapse;
-            background: #f7f7f7 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAPklEQVQYV43M2QkAIAwEUVPcVr3FKREUj1zz/RhphUh2yZwiABLChXTmwhO58EUmtNAHPXTBCG2YoQkrSOEAyK0nO9YyUYwAAAAASUVORK5CYII=);
-        }
-
-            table.booking-calendar thead th {
-                padding: 3px 0 0;
-                font-weight: bold;
-                line-height: normal;
-                text-align: center;
-                text-transform: uppercase;
-                background: #f8f8f8;
-                border-bottom: 2px solid #bfc1c3;
-            }
-
-            table.booking-calendar th, table.booking-calendar td {
-                width: 14.28571%;
-            }
-
-            table.booking-calendar tbody td {
-                padding: 0;
-                border-color: #dee0e2;
-                border-style: solid;
-                border-width: 0 0 1px 1px;
-            }
-
-        .BookingCalendar-content {
-            position: relative;
-            min-height: 55px;
-        }
-
-        a.BookingCalendar-dateLink, a.BookingCalendar-dateLink:visited {
-            position: absolute;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            color: #0b0c0c;
-            text-decoration: none;
-        }
-
-            a.BookingCalendar-dateLink .BookingCalendar-day {
-                padding-left: 3px;
-            }
-
-            a.BookingCalendar-dateLink:hover {
-                color: #0b0c0c;
-                text-decoration: underline;
-                background: #d5e8f3;
-            }
-
-        .BookingCalendar-tag {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 0;
-            color: white;
-            line-height: normal;
-            text-align: center;
-            background: #6f777b;
-        }
-        .BookingCalendar-tag--today {
-        background: #2b8cc4;
-    }
-        .BookingCalendar-date--bookable.is-active {
-        background: #96c6e2;
-    }
-        .BookingCalendar-legend { margin-top: 1em; }
-        .BookingCalendar-legend > li { padding-right: 2em; }
-</style>
 @using (Html.BeginForm())
 {
-
     <fieldset>
         <div class="row">
             <div class="col-md-5">
-                <div class="BookingCalendar hidden--mobile">
+                <div class="BookingCalendar">
                     <div class="BookingCalendar-header">
-                        <button type="submit" class="BookingCalendar-nav BookingCalendar-nav--prev btn-link" name="availability" value="@ActiveMonth.AddMonths(-1).ToString("yyyy-M-d")"><span class="glyphicon glyphicon-menu-left"></span></button>
+                        <button type="submit" class="BookingCalendar-nav BookingCalendar-nav--prev btn btn-link" name="availability" value="@ActiveMonth.AddMonths(-1).ToString("yyyy-M-d")"><span class="glyphicon glyphicon-menu-left"></span></button>
                         <span class="BookingCalendar-currentMonth">@ActiveMonth.ToString("MMMM")</span>
-                        <button type="submit" class="BookingCalendar-nav BookingCalendar-nav--next btn-link" name="availability" value="@ActiveMonth.AddMonths(1).ToString("yyyy-M-d")"><span class="glyphicon glyphicon-menu-right"></span></button>
+                        <button type="submit" class="BookingCalendar-nav BookingCalendar-nav--next btn btn-link" name="availability" value="@ActiveMonth.AddMonths(1).ToString("yyyy-M-d")"><span class="glyphicon glyphicon-menu-right"></span></button>
                     </div>
 
                     <table class="booking-calendar">
@@ -177,6 +45,7 @@
                                     var EndDate = ViewBag.EndDate;
                                     var i = 0;
                                     var CssClass = "";
+                                    var Title = "";
                                 }
 
                                 <tr>
@@ -186,12 +55,14 @@
                                             i++;
                                             List<TimeSpan> AvailableTimes;
                                             Model.TryGetValue(StartDate, out AvailableTimes);
-                                            if (AvailableTimes != null && AvailableTimes.Count() > 0)
+                                            if (AvailableTimes != null && AvailableTimes.Count() > 0 && !BankHolidays.Contains(StartDate))
                                             {
                                                 CssClass = "BookingCalendar-date--bookable";
                                             }
+
+                                            Title = StartDate.ToString("dddd d MMMM") + (BankHolidays.Contains(StartDate) ? " - Bank Holiday" : "");
                                         }
-                                        <td title="@StartDate.ToString("dddd d MMMM")" class="@CssClass">
+                                        <td title="@Title" class="@CssClass">
                                             <div class="BookingCalendar-content">
                                                 <a class="BookingCalendar-dateLink" data-date="@StartDate.ToString("yyyy-MM-dd")" href="#date-@StartDate.ToString("yyyy-MM-dd")">
                                                     <span class="BookingCalendar-day">@StartDate.Day</span>
@@ -202,6 +73,10 @@
                                                     @if (StartDate.Day == 1)
                                                     {
                                                         <span class="BookingCalendar-tag" id="month-2016-07">@StartDate.ToString("MMM")</span>
+                                                    }
+                                                    @if (BankHolidays.Contains(StartDate))
+                                                    {
+                                                        <span class="BookingCalendar-tag BookingCalendar-tag--bankHoliday">BH</span>
                                                     }
                                                 </a>
                                             </div>
@@ -251,6 +126,10 @@
                                 {
                                     <p>It is not possible to book in the past.</p>
                                 }
+                                else if (BankHolidays.Contains(StartDate))
+                                {
+                                    <p>It is not possible to book on a Bank Holiday.</p>
+                                }
                                 else if (AvailableTimes != null && AvailableTimes.Count() > 0)
                                 {
                                     foreach (var Time in AvailableTimes)
@@ -274,7 +153,7 @@
             </div>
         </div>
     </fieldset>
-                            }
+}
 @section FooterScripts
 {
     <script>

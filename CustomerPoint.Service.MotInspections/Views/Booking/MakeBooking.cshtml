@@ -57,7 +57,7 @@
                 @Html.DescriptionFor(model => model.VehicleReg)
                 @Html.ValidationMessageFor(model => model.VehicleReg, "", new { @class = "help-block" })
                 <div class="input-group">
-                    @Html.EditorFor(model => model.VehicleReg, string.Empty, new { htmlAttributes = new { @class = "form-control text-upper", maxlength = "8", placeholder = "e.g. AB12 3CD" } })
+                    @Html.TextBox("VehicleRegQ", string.Empty, new { @class = "form-control text-upper", maxlength = "8", placeholder = "e.g. AB12 3CD" })
                     <span class="input-group-btn">
                         <button class="btn btn-default btn-vehicle-lookup" type="button">Lookup vehicle details</button>
                     </span>
@@ -69,13 +69,13 @@
 
     if (!string.IsNullOrWhiteSpace(Model.VehicleReg))
     {
-        <div class="row" id="vehicle-details" data-src="@Url.Action("Vehicle", "History")">
-            @Html.Action("Vehicle", "History", new { vrm = Model.VehicleReg })
+        <div class="row" id="vehicle-details" data-src="@Url.Action("Info", "Vehicle")">
+            @Html.Action("Info", "Vehicle", new { vrm = Model.VehicleReg })
         </div>
     }
     else
     {
-        <div class="row hide spinner" id="vehicle-details" data-src="@Url.Action("Vehicle", "History")"></div>
+        <div class="row hide spinner" id="vehicle-details" data-src="@Url.Action("Info", "Vehicle")"></div>
     }
 
     <div class="row">
@@ -147,6 +147,9 @@
                 vh.removeClass('hide');
                 $.get(vh.data('src') + '?vrm=' + vrm, function (view) {
                     vh.removeClass('spinner').html(view);
+                    $('html, body').animate({
+                        scrollTop: (vh.offset().top - 200)
+                    }, 500);
                 });
             });
 

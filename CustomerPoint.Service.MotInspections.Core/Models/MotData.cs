@@ -56,6 +56,7 @@ namespace CustomerPoint.Service.MotInspections.Models
         public virtual Service Parent { get; set; }
         public virtual ICollection<Service> Services { get; set; }
         public virtual ICollection<ServiceCustomer> Customers { get; set; }
+        public virtual ICollection<Resource> Resources { get; set; }
     }
 
     [DisplayColumn("Name")]
@@ -340,6 +341,24 @@ namespace CustomerPoint.Service.MotInspections.Models
         public int Id { get; set; }
         [Required(AllowEmptyStrings = false)]
         public string Name { get; set; }
+
+        [DataType(DataType.Date)]
+        [Display(Description = "The optional date this resource is available from")]
+        [DisplayFormat(NullDisplayText = "-")]
+        public DateTime? Start { get; set; }
+
+        [DataType(DataType.Date)]
+        [Display(Description = "The optional date this resource is available until")]
+        [DisplayFormat(NullDisplayText = "-")]
+        public DateTime? End { get; set; }
+
+        [Display(Name = "Type of resource")]
+        public int? ParentId { get; set; }
+
+        public Resource Parent { get; set; }
+
+        public virtual ICollection<Resource> Resources { get; set; }
+        public virtual ICollection<Service> Services { get; set; }
     }
 
     public class MotData : DbContext

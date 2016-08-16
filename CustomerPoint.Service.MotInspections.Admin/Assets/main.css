@@ -28,7 +28,11 @@
 }
 .navbar-gbc .navbar-form
 {
-	margin-top: 11px;	
+	margin-top: 5px;	
+}
+.input-group-btn > .btn {
+    margin-bottom: -2px;
+    padding: 7px 12px;
 }
 .navbar-brand {
     color: #fff;

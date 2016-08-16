@@ -16,7 +16,9 @@ namespace CustomerPoint.Service.MotInspections.Migrations
         {
             context.Resources.AddOrUpdate(
                 r => r.Name,
-                new Resource { Name = "MoT bay" });
+                new Resource { Id = 1, Name = "MoT bay" },
+                new Resource { Id = 2, Name = "MoT bay 1", ParentId = 1 },
+                new Resource { Id = 3, Name = "MoT bay 2", ParentId = 1 });
 
             context.Customers.AddOrUpdate(
                 c => new { c.Name },

@@ -67,7 +67,7 @@ namespace CustomerPoint.Service.MotInspections.Controllers
                 EndDate = EndDate.AddDays(1);
             }
 
-
+            var BankHolidays = await Data.BankHolidays();
             var Bookings = await db.Slots.OfType<Booking>().Where(b => DbFunctions.TruncateTime(b.Date) >= DbFunctions.TruncateTime(StartDate) && DbFunctions.TruncateTime(b.Date) <= DbFunctions.TruncateTime(EndDate) && !b.Cancelled.HasValue).ToListAsync();
             var Reservations = await db.Slots.OfType<Reservation>().Where(b => DbFunctions.TruncateTime(b.Date) >= DbFunctions.TruncateTime(StartDate) && DbFunctions.TruncateTime(b.Date) <= DbFunctions.TruncateTime(EndDate) && (!b.Expires.HasValue || b.Expires > DateTime.Now)).ToListAsync();
 //TODO filter reservations to type of booking?
@@ -84,7 +84,7 @@ namespace CustomerPoint.Service.MotInspections.Controllers
 
             do
             {
-                if (TheDate.DayOfWeek > DayOfWeek.Sunday && TheDate.DayOfWeek < DayOfWeek.Saturday)
+                if (TheDate.DayOfWeek > DayOfWeek.Sunday && TheDate.DayOfWeek < DayOfWeek.Saturday && !BankHolidays.Contains(TheDate.Date))
                 {
                     var Times = new List<TimeSpan>();
                     var TheSlot = StartOfMorning;
@@ -128,6 +128,9 @@ namespace CustomerPoint.Service.MotInspections.Controllers
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
             ViewBag.Service = Service.Service.Name;
+
+            ViewBag.BankHolidays = BankHolidays;
+
             return View(AvailableSlots);
         }
 
@@ -215,6 +218,20 @@ namespace CustomerPoint.Service.MotInspections.Controllers
             Reservation.Expires = DateTime.Now.AddMinutes(10);
             var x = await db.SaveChangesAsync();
 
+            // Check which resource is available
+
+            var ResourceIdsToCheck = (Reservation.Resource.Resources.Count() > 0) ? Reservation.Resource.Resources.Select(r => r.Id) : new List<int>() { Reservation.ResourceId };
+
+            var ExistingBookings = db.Slots.OfType<Booking>().Where(b => ResourceIdsToCheck.Contains(b.ResourceId) && b.Date == Reservation.Date).Select(b => b.ResourceId);
+            var ExistingReservations = db.Slots.OfType<Reservation>().Where(b => ResourceIdsToCheck.Contains(b.ResourceId) && b.Date == Reservation.Date && b.Id != Reservation.Id && b.Expires > DateTime.Now).Select(r => r.ResourceId);
+
+            var ValidResourceIds = ResourceIdsToCheck.Except(ExistingBookings.Union(ExistingReservations));
+
+            if (ValidResourceIds.Count() == 0)
+            {
+                ModelState.AddModelError(string.Empty, "No resource available to book.");
+            }
+
             if (ModelState.IsValid)
             {
                 var b = new Booking();
@@ -225,7 +242,7 @@ namespace CustomerPoint.Service.MotInspections.Controllers
                 b.IgnoreReservation = true;
                 b.Name = booking.Name;
                 b.PriceToPay = Service.Price;
-                b.ResourceId = 1;
+                b.ResourceId = ValidResourceIds.First();
                 b.ServiceId = Service.ServiceId;
                 b.Status = Status.Outstanding;
                 b.Telephone = booking.Telephone;

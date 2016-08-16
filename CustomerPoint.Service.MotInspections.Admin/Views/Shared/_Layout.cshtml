@@ -14,13 +14,35 @@
 
     bool Legacy = (bool?)ViewContext.ViewData["LegacyMode"] ?? false;
 
+    string JsDelivr = (string)ViewContext.ViewData["JsDelivr"] ?? "";
+    
+    bool FluidLayout = (bool?)ViewContext.ViewData["FluidLayout"] ?? false;
+
     if (Legacy)
     {
         HtmlClass += " legacy";
-        if (String.IsNullOrEmpty(AppTitle))
+        if (string.IsNullOrEmpty(AppTitle))
         {
             AppTitle = "Guildford Borough Council";
         }
+    }
+    
+    if (!string.IsNullOrWhiteSpace(JsDelivr))
+    {
+        JsDelivr = "," + JsDelivr;
+    }
+    
+    // Layout
+    
+    string ContainerClass = "container";
+    string BodyClass = "col-xs-12";
+    string FooterClass = "col-md-7";
+    
+    if (FluidLayout)
+    {
+        ContainerClass = "container-fluid";
+        BodyClass = "col-md-10 col-md-offset-1";
+        FooterClass = "col-md-6 col-md-offset-1";
     }
 }
 <!DOCTYPE html>
@@ -29,7 +51,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     @if(!Legacy){<link href="//fonts.googleapis.com/css?family=Noto+Sans:400,700" rel="stylesheet">}
     @Styles.Render("~/assets/css")
     <title>@if (!String.IsNullOrWhiteSpace(ViewBag.Title))
@@ -63,7 +85,7 @@
 <body id="top">
     <a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
     <header role="banner" class="navbar navbar-gbc">
-        <div class="container">
+        <div class="@ContainerClass">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -100,7 +122,7 @@
         </div>
     </header>
     @RenderSection("ServiceStage", required: false)
-    <div class="container">
+    <div class="@ContainerClass">
         @if (IsSectionDefined("Breadcrumb"))
         {
             if (Legacy)
@@ -129,7 +151,7 @@
         }
         <div class="article">
             <div class="row">
-                <div class="col-xs-12">
+                <div class="@BodyClass">
                     @RenderBody()
                 </div>
             </div>
@@ -138,14 +160,14 @@
     @if (IsSectionDefined("Footer"))
     {
     <footer role="contentinfo">
-        <div class="container">
+        <div class="@ContainerClass">
             <div class="row">
                 @RenderSection("Footer", required: false)
             </div>
             @if (!Legacy)
             {
             <div class="row footer-appInfo">
-                <div class="col-md-7">
+                <div class="@FooterClass">
                     <ul class="list-inline">
                         @if (!String.IsNullOrWhiteSpace(SupportUrl))
                         {
@@ -180,8 +202,7 @@
         </div>
     </footer>
     }
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="//cdn.jsdelivr.net/g/jquery@2.2.4,bootstrap@3.3.6@(JsDelivr)"></script>
     @if (Legacy)
     {
     <script src="//platform.twitter.com/widgets.js" async></script>

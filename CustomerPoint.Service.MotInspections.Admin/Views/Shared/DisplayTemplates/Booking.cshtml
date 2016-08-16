@@ -1,0 +1,5 @@
+﻿@model CustomerPoint.Service.MotInspections.Models.Booking
+@if (Model != null)
+{
+    @Html.ActionLink(Model.Name + " " + Model.VehicleRegistration + " - " + Model.Service.Name, "Details", new { Id = Model.Id }, new { @class = "btn btn-default btn-sm" })
+}

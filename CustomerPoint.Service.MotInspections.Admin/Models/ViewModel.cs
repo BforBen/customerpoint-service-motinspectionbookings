@@ -14,6 +14,13 @@ namespace CustomerPoint.Service.MotInspections.Admin.Models
         public IEnumerable<MotInspections.Models.Service> Services { get; set; }
     }
 
+    public class BookingViewModel
+    {
+        public IEnumerable<Booking> Bookings { get; set; }
+        public IEnumerable<Reservation> Reservations { get; set; }
+        public IEnumerable<Resource> Resources { get; set; }
+    }
+
     public class ReportModel
     {
         public ReportModel()

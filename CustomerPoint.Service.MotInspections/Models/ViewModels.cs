@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace CustomerPoint.Service.MotInspections.Models
@@ -46,5 +47,11 @@ namespace CustomerPoint.Service.MotInspections.Models
 
         [DisplayFormat(DataFormatString = "{0:dddd d MMMM yyyy h:mm tt}")]
         public DateTime Slot { get; set; }
+    }
+
+    public class VehicleHistoryModel
+    {
+        public VehicleInfo.Models.VehicleData Data { get; set; }
+        public IEnumerable<Booking> Bookings { get; set; }
     }
 }
